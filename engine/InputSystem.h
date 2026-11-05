@@ -1,6 +1,9 @@
 #pragma once
 
+#include <string>
+
 #include "Keyboard.h"
+#include "SystemManager.h"
 
 namespace ECSEngine {
 

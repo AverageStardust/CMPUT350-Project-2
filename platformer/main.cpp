@@ -1,23 +1,18 @@
-#include <fstream>
-
 #include "CameraSystem.h"
 #include "CollisionComponent.h"
 #include "CollisionLateSystem.h"
 #include "CollisionSystem.h"
 #include "ECSEngine.h"
-#include "EntityManager.h"
 #include "GravitySystem.h"
 #include "InputComponent.h"
 #include "InputSystem.h"
 #include "LocationComponent.h"
-#include "MathUtil.h"
 #include "MovementSystem.h"
 #include "ScoreComponent.h"
 #include "ScoreSystem.h"
 #include "SpawnComponent.h"
 #include "SpawnSystem.h"
 #include "SpriteComponent.h"
-#include "SpriteManager.h"
 #include "SpriteSystem.h"
 
 std::string gResourcePath = "../assets/";

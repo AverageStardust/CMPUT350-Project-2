@@ -1,5 +1,4 @@
-#ifndef MATHUTIL_H
-#define MATHUTIL_H
+#pragma once
 
 #include <iostream>
 
@@ -12,25 +11,25 @@ struct Point2D {
 
     Point2D(float x = 0, float y = 0) : x(x), y(y) {}
 
-    Point2D operator+(const Point2D &other) const;
-    Point2D operator+(const float &scalar) const;
-    Point2D operator-(const Point2D &other) const;
-    Point2D operator-(const float &scalar) const;
-    Point2D operator*(const float &scalar) const;
-    Point2D operator/(const float &scalar) const;
-    float operator*(const Point2D &other) const;
-    bool operator==(const Point2D &other) const;
-    bool operator<(const Point2D &other) const;
-    bool operator>(const Point2D &other) const;
-    bool operator<=(const Point2D &other) const;
-    bool operator>=(const Point2D &other) const;
+    Point2D operator+(const Point2D& other) const;
+    Point2D operator+(const float& scalar) const;
+    Point2D operator-(const Point2D& other) const;
+    Point2D operator-(const float& scalar) const;
+    Point2D operator*(const float& scalar) const;
+    Point2D operator/(const float& scalar) const;
+    float operator*(const Point2D& other) const;
+    bool operator==(const Point2D& other) const;
+    bool operator<(const Point2D& other) const;
+    bool operator>(const Point2D& other) const;
+    bool operator<=(const Point2D& other) const;
+    bool operator>=(const Point2D& other) const;
 
-    Point2D &operator+=(const Point2D &other);
-    Point2D &operator+=(const float &scalar);
-    Point2D &operator-=(const Point2D &other);
-    Point2D &operator-=(const float &scalar);
-    Point2D &operator*=(const float &scalar);
-    Point2D &operator/=(const float &scalar);
+    Point2D& operator+=(const Point2D& other);
+    Point2D& operator+=(const float& scalar);
+    Point2D& operator-=(const Point2D& other);
+    Point2D& operator-=(const float& scalar);
+    Point2D& operator*=(const float& scalar);
+    Point2D& operator/=(const float& scalar);
 
     Point2D Min(Point2D other) const;
     Point2D Max(Point2D other) const;
@@ -38,8 +37,8 @@ struct Point2D {
     Point2D Sign() const;
     float Dot(Point2D other) const;
     float Cross(Point2D other) const;
-    float Distance(const Point2D &other) const;
-    float DistanceSq(const Point2D &other) const;
+    float Distance(const Point2D& other) const;
+    float DistanceSq(const Point2D& other) const;
     float Angle() const;
     void Normalize();
     Point2D Normalized() const;
@@ -56,8 +55,8 @@ private:
     sf::Vector2f AsSfmlVector() const;
 };
 
-std::ostream &operator<<(std::ostream &os, const Point2D &p);
-Point2D operator*(float scalar, const Point2D &point);
+std::ostream& operator<<(std::ostream& os, const Point2D& p);
+Point2D operator*(float scalar, const Point2D& point);
 
 struct Circle;
 struct Rect;
@@ -71,14 +70,14 @@ struct Line {
 
     float Length() const;
     Point2D Lerp(float t) const;
-    Point2D ClosestPoint(const Point2D &p) const;
-    bool Intersects(const Line &other, Point2D &point) const;
-    bool Intersects(const Circle &other, Point2D &point) const;
-    bool Intersects(const Rect &other, Point2D &point) const;
-    bool Intersects(const Quad &other, Point2D &point) const;
+    Point2D ClosestPoint(const Point2D& p) const;
+    bool Intersects(const Line& other, Point2D& point) const;
+    bool Intersects(const Circle& other, Point2D& point) const;
+    bool Intersects(const Rect& other, Point2D& point) const;
+    bool Intersects(const Quad& other, Point2D& point) const;
 };
 
-std::ostream &operator<<(std::ostream &os, const Line &l);
+std::ostream& operator<<(std::ostream& os, const Line& l);
 
 struct Circle {
     Point2D center;
@@ -87,13 +86,13 @@ struct Circle {
     Circle(Point2D c = {0, 0}, float r = 0) : center(c), radius(r) {}
     Circle(float x, float y, float r) : center(x, y), radius(r) {}
 
-    bool Intersects(const Line &other, Point2D &point) const;
-    bool Intersects(const Circle &other, Point2D &point) const;
-    bool Intersects(const Rect &other, Point2D &point) const;
-    bool Intersects(const Quad &other, Point2D &point) const;
+    bool Intersects(const Line& other, Point2D& point) const;
+    bool Intersects(const Circle& other, Point2D& point) const;
+    bool Intersects(const Rect& other, Point2D& point) const;
+    bool Intersects(const Quad& other, Point2D& point) const;
 };
 
-std::ostream &operator<<(std::ostream &os, const Circle &l);
+std::ostream& operator<<(std::ostream& os, const Circle& l);
 
 struct Rect {
     Point2D topLeft;
@@ -113,34 +112,34 @@ struct Rect {
         : topLeft(circle.center - circle.radius), bottomRight(circle.center + circle.radius) {}
     Rect(Line line) : topLeft(line.p1.Min(line.p2)), bottomRight(line.p1.Max(line.p2)) {}
 
-    Rect operator|(const Point2D &other) const;
-    Rect operator|(const Line &other) const;
-    Rect operator|(const Rect &other) const;
-    Rect operator|(const Quad &other) const;
-    Rect operator&(const Rect &other) const;
+    Rect operator|(const Point2D& other) const;
+    Rect operator|(const Line& other) const;
+    Rect operator|(const Rect& other) const;
+    Rect operator|(const Quad& other) const;
+    Rect operator&(const Rect& other) const;
 
-    Rect &operator|=(const Point2D &other);
-    Rect &operator|=(const Line &other);
-    Rect &operator|=(const Rect &other);
-    Rect &operator|=(const Quad &other);
-    Rect &operator&=(const Rect &other);
+    Rect& operator|=(const Point2D& other);
+    Rect& operator|=(const Line& other);
+    Rect& operator|=(const Rect& other);
+    Rect& operator|=(const Quad& other);
+    Rect& operator&=(const Rect& other);
 
     void Inset(int inset);
     Rect Inseted(int inset) const;
-    bool IsInside(const Point2D &p) const;
-    bool IsOverlapping(const Rect &rect) const;
+    bool IsInside(const Point2D& p) const;
+    bool IsOverlapping(const Rect& rect) const;
     float Width() const;
     float Height() const;
     Point2D Size() const;
     Point2D Center() const;
     bool Exists() const;
-    bool Intersects(const Line &other, Point2D &point) const;
-    bool Intersects(const Circle &other, Point2D &point) const;
-    bool Intersects(const Rect &other, Point2D &point) const;
-    bool Intersects(const Quad &other, Point2D &point) const;
+    bool Intersects(const Line& other, Point2D& point) const;
+    bool Intersects(const Circle& other, Point2D& point) const;
+    bool Intersects(const Rect& other, Point2D& point) const;
+    bool Intersects(const Quad& other, Point2D& point) const;
 };
 
-std::ostream &operator<<(std::ostream &os, const Rect &r);
+std::ostream& operator<<(std::ostream& os, const Rect& r);
 
 struct Quad {
     Point2D points[4];
@@ -153,13 +152,13 @@ struct Quad {
                  {rect.bottomRight.x, rect.topLeft.y}} {}
 
     Line Segment(int index) const;
-    bool Intersects(const Line &other, Point2D &point) const;
-    bool Intersects(const Circle &other, Point2D &point) const;
-    bool Intersects(const Rect &other, Point2D &point) const;
-    bool Intersects(const Quad &other, Point2D &point) const;
+    bool Intersects(const Line& other, Point2D& point) const;
+    bool Intersects(const Circle& other, Point2D& point) const;
+    bool Intersects(const Rect& other, Point2D& point) const;
+    bool Intersects(const Quad& other, Point2D& point) const;
 };
 
-std::ostream &operator<<(std::ostream &os, const Quad &q);
+std::ostream& operator<<(std::ostream& os, const Quad& q);
 
 // 2x2 matrix
 struct Matrix2 {
@@ -169,16 +168,16 @@ struct Matrix2 {
     Matrix2(float a, float b, float c, float d) : cells{a, b, c, d} {}
     Matrix2(float (&&basis)[4]);
 
-    Matrix2 operator*(const float &scalar) const;
-    Point2D operator*(const Point2D &vector) const;
-    Matrix2 operator*(const Matrix2 &other) const;
+    Matrix2 operator*(const float& scalar) const;
+    Point2D operator*(const Point2D& vector) const;
+    Matrix2 operator*(const Matrix2& other) const;
 
     float Determinant() const;
     Matrix2 Inverse() const;
 };
 
-Point2D operator*(const Point2D &vector, const Matrix2 &transform);
-std::ostream &operator<<(std::ostream &os, const Matrix2 &m);
+Point2D operator*(const Point2D& vector, const Matrix2& transform);
+std::ostream& operator<<(std::ostream& os, const Matrix2& m);
 
 // Augmented 2x2 matrix representing 2d transformations
 struct Transform2D {
@@ -191,12 +190,12 @@ struct Transform2D {
     static Transform2D Translation(Point2D offset);
     static Transform2D Scale(float factor);
 
-    Point2D operator*(const Point2D &vector) const;
-    Line operator*(const Line &line) const;
-    Circle operator*(const Circle &circle) const;
-    Quad operator*(const Rect &rect) const;
-    Quad operator*(const Quad &rect) const;
-    Transform2D operator*(const Transform2D &other) const;
+    Point2D operator*(const Point2D& vector) const;
+    Line operator*(const Line& line) const;
+    Circle operator*(const Circle& circle) const;
+    Quad operator*(const Rect& rect) const;
+    Quad operator*(const Quad& rect) const;
+    Transform2D operator*(const Transform2D& other) const;
 
     Transform2D Inverse() const;
     float Scale() const;
@@ -204,14 +203,12 @@ struct Transform2D {
     float Rotation() const;
 };
 
-Point2D operator*(const Point2D &vector, const Transform2D &transform);
-Point2D &operator*=(Point2D &vector, const Transform2D &transform);
-Line &operator*=(Line &line, const Transform2D &transform);
-Circle &operator*=(Circle &circle, const Transform2D &transform);
-Quad &operator*=(Quad &quad, const Transform2D &transform);
-Transform2D &operator*=(Transform2D &other, const Transform2D &transform);
-std::ostream &operator<<(std::ostream &os, const Transform2D &t);
+Point2D operator*(const Point2D& vector, const Transform2D& transform);
+Point2D& operator*=(Point2D& vector, const Transform2D& transform);
+Line& operator*=(Line& line, const Transform2D& transform);
+Circle& operator*=(Circle& circle, const Transform2D& transform);
+Quad& operator*=(Quad& quad, const Transform2D& transform);
+Transform2D& operator*=(Transform2D& other, const Transform2D& transform);
+std::ostream& operator<<(std::ostream& os, const Transform2D& t);
 
-}  // namespace CMPUT350
-
-#endif  // MATHUTIL_H
+}  // namespace ECSEngine

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <array>
-#include <tuple>
+#include <string>
 
 // An entity can have any component it is templated with,
 // but does not have these installed by default.

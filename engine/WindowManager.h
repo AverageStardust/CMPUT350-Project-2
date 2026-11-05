@@ -1,7 +1,5 @@
 #pragma once
 
-#include <unordered_map>
-
 #include "MathUtil.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
+
+#include "SystemManager.h"
+
 namespace ECSEngine {
 
 template <typename... Components>
