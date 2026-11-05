@@ -9,6 +9,7 @@
 #include "main.h"
 
 struct SpriteType {
+    char symbol;
     std::string sheetPath;  // TODO: probably replace later
     ECSEngine::Rect sheetLocation;
     ECSEngine::Rect boundingBox;
@@ -54,13 +55,14 @@ std::ifstream& ReadRect(std::ifstream& os, ECSEngine::Rect& rect) {
 
 bool ReadDictionaryLine(std::ifstream& file, int dictionaryType,
                         std::unordered_map<char, SpriteType>& spriteTypes) {
-    std::string symbol;
-    file >> symbol;
+    std::string symbolStr;
+    file >> symbolStr;
 
-    if (symbol.length() != 1) {
-        file.seekg(-symbol.length(), std::fstream::cur);
+    if (symbolStr.length() != 1) {
+        file.seekg(-symbolStr.length(), std::fstream::cur);
         return false;
     }
+    char symbol = symbolStr[0];
 
     std::string sheetPath;
     file >> std::ws >> sheetPath >> std::ws;
@@ -76,9 +78,9 @@ bool ReadDictionaryLine(std::ifstream& file, int dictionaryType,
         ECSEngine::Rect boundingBox;
         ReadRect(file, boundingBox);
         file >> std::ws;
-        spriteTypes[symbol[0]] = SpriteType{sheetPath, sheetLocation, boundingBox, true};
+        spriteTypes[symbol] = SpriteType{symbol, sheetPath, sheetLocation, boundingBox, true};
     } else {
-        spriteTypes[symbol[0]] = SpriteType{sheetPath, sheetLocation, {}, false};
+        spriteTypes[symbol] = SpriteType{symbol, sheetPath, sheetLocation, {}, false};
     }
 
     return true;
@@ -148,6 +150,10 @@ void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, Sprit
 
 void LoadMap(Engine& engine, const std::string& path) {
     std::ifstream file(path);
+
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open map \"" + path + "\"");
+    }
 
     std::unordered_map<char, SpriteType> dictonary = ReadDictionary(file);
     ReadMap(engine, file, dictonary);

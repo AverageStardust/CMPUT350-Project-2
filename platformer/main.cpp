@@ -13,7 +13,7 @@
 #include "SpriteSystem.h"
 #include "loadMap.h"
 
-std::string gResourcePath = "assets/";
+std::string gResourcePath = "../assets/";
 
 int main(int argc, char* argv[]) {
     if (argc >= 3 && argv[1] == std::string("-path")) {
@@ -22,6 +22,9 @@ int main(int argc, char* argv[]) {
     std::cout << "Usage: " << argv[0] << " [-path resource_path]\n";
     std::cout << "Using resource path: " << gResourcePath << "\n";
 
+    // set current working directory to executable location
+    std::filesystem::current_path(std::filesystem::path{argv[0]}.parent_path());
+
     // Engine test code
     Engine engine(1024, 768, "Test Engine");
 
@@ -29,7 +32,7 @@ int main(int argc, char* argv[]) {
 
     // Load maps
     LoadMap(engine, std::filesystem::path{gResourcePath}.concat("sky.map"));
-    LoadMap(engine, std::filesystem::path{gResourcePath}.concat("world.map"));
+    LoadMap(engine, std::filesystem::path{gResourcePath}.concat("testWorld.map"));
 
     // Place player
 
