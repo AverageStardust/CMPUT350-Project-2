@@ -8,10 +8,9 @@
 #include "MathUtil.h"
 #include "main.h"
 
-struct SpriteType {
+struct TileType {
     char symbol;
-    std::string sheetPath;  // TODO: probably replace later
-    ECSEngine::Rect sheetLocation;
+    ECSEngine::SpriteID sprite;
     ECSEngine::Rect boundingBox;
     bool hasBoundingBox;
 };
@@ -53,8 +52,8 @@ std::ifstream& ReadRect(std::ifstream& os, ECSEngine::Rect& rect) {
     return os;
 }
 
-bool ReadDictionaryLine(std::ifstream& file, int dictionaryType,
-                        std::unordered_map<char, SpriteType>& spriteTypes) {
+bool ReadDictionaryLine(Engine& engine, std::ifstream& file, int dictionaryType,
+                        std::unordered_map<char, TileType>& dictionary) {
     std::string symbolStr;
     file >> symbolStr;
 
@@ -74,19 +73,22 @@ bool ReadDictionaryLine(std::ifstream& file, int dictionaryType,
     ReadRect(file, sheetLocation);
     file >> std::ws;
 
+    ECSEngine::SpriteID spriteId =
+        engine.GetSpriteManager().RegisterTexture(sheetPath, sheetLocation);
+
     if (dictionaryType == 2) {
         ECSEngine::Rect boundingBox;
         ReadRect(file, boundingBox);
         file >> std::ws;
-        spriteTypes[symbol] = SpriteType{symbol, sheetPath, sheetLocation, boundingBox, true};
+        dictionary[symbol] = TileType{symbol, spriteId, boundingBox, true};
     } else {
-        spriteTypes[symbol] = SpriteType{symbol, sheetPath, sheetLocation, {}, false};
+        dictionary[symbol] = TileType{symbol, spriteId, {}, false};
     }
 
     return true;
 }
 
-std::unordered_map<char, SpriteType> ReadDictionary(std::ifstream& file) {
+std::unordered_map<char, TileType> ReadDictionary(Engine& engine, std::ifstream& file) {
     int dictionaryType;
 
     expectStr(file, "dictionary");
@@ -97,17 +99,17 @@ std::unordered_map<char, SpriteType> ReadDictionary(std::ifstream& file) {
         throw std::runtime_error("Invalid dictionary type");
     }
 
-    std::unordered_map<char, SpriteType> spriteTypes;
-    while (ReadDictionaryLine(file, dictionaryType, spriteTypes));
+    std::unordered_map<char, TileType> dictionary;
+    while (ReadDictionaryLine(engine, file, dictionaryType, dictionary));
 
-    return spriteTypes;
+    return dictionary;
 }
 
-void AddSprite(Engine& engine, SpriteType& type, ECSEngine::Point2D position) {
+void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position) {
     // TODO: do something with all this data
 }
 
-void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, SpriteType>& dictonary) {
+void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, TileType>& dictonary) {
     expectStr(file, "map");
     file >> std::ws;
 
@@ -138,9 +140,9 @@ void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, Sprit
 
             if (symbol != '.') {
                 if (dictonary.contains(symbol)) {
-                    AddSprite(engine, dictonary[symbol], position);
+                    AddTile(engine, dictonary[symbol], position);
                 } else {
-                    throw std::runtime_error("Undefined sprite \"" + std::string{symbol} + "\"");
+                    throw std::runtime_error("Undefined tile \"" + std::string{symbol} + "\"");
                 }
             }
         }
@@ -155,7 +157,7 @@ void LoadMap(Engine& engine, const std::string& path) {
         throw std::runtime_error("Could not open map \"" + path + "\"");
     }
 
-    std::unordered_map<char, SpriteType> dictonary = ReadDictionary(file);
+    std::unordered_map<char, TileType> dictonary = ReadDictionary(engine, file);
     ReadMap(engine, file, dictonary);
 
     if (!file.eof()) {
