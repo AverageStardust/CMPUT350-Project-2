@@ -363,7 +363,7 @@ bool Quad::Intersects(const Rect &other, Point2D &point) const {
 bool Quad::Intersects(const Quad &other, Point2D &point) const {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            if (Segment(i).Intersects(Segment(j), point)) return true;
+            if (Segment(i).Intersects(other.Segment(j), point)) return true;
         }
     }
     return false;

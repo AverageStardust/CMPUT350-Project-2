@@ -24,7 +24,7 @@ endif()
 set(ECS_ENGINE_FILES
     ECSEngine.h
     Entity.h
-    MathUtil.h
+    MathUtil.h MathUtil.cpp
     Keyboard.h
 )
 

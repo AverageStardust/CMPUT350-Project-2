@@ -1,29 +1,19 @@
+#include "main.h"
+
+#include <filesystem>
+
 #include "CameraSystem.h"
-#include "CollisionComponent.h"
 #include "CollisionLateSystem.h"
 #include "CollisionSystem.h"
-#include "ECSEngine.h"
 #include "GravitySystem.h"
-#include "InputComponent.h"
 #include "InputSystem.h"
-#include "LocationComponent.h"
 #include "MovementSystem.h"
-#include "ScoreComponent.h"
 #include "ScoreSystem.h"
-#include "SpawnComponent.h"
 #include "SpawnSystem.h"
-#include "SpriteComponent.h"
 #include "SpriteSystem.h"
+#include "loadMap.h"
 
-std::string gResourcePath = "../assets/";
-#define COMPONENTS                                                                             \
-    ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent, \
-        ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,     \
-        ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,     \
-        ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::RespawnComponent
-using Engine = ECSEngine::ECSEngine<COMPONENTS>;
-
-void LoadMap(Engine& engine, const std::string& path, const std::string& file) {}
+std::string gResourcePath = "assets/";
 
 int main(int argc, char* argv[]) {
     if (argc >= 3 && argv[1] == std::string("-path")) {
@@ -38,6 +28,8 @@ int main(int argc, char* argv[]) {
     // Load sounds
 
     // Load maps
+    LoadMap(engine, std::filesystem::path{gResourcePath}.concat("sky.map"));
+    LoadMap(engine, std::filesystem::path{gResourcePath}.concat("world.map"));
 
     // Place player
 
