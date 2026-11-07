@@ -2,6 +2,8 @@
 
 #include <type_traits>
 
+namespace ECSEngine {
+
 namespace pack_detail {
 
 // base case, empty list
@@ -65,3 +67,5 @@ struct Pack {
     template <typename QueryType>
     static constexpr bool contains = (index<QueryType> != -1);
 };
+
+}  // namespace ECSEngine

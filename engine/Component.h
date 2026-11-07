@@ -4,12 +4,34 @@
 
 namespace ECSEngine {
 
+#include <assert.h>
+
+#include <cstddef>
+#include <vector>
+
+using Ticket = size_t;
+
 template <typename T>
 class ComponentStorage {
+    std::vector<T> slots;
+    std::vector<size_t> freeSlots;
+    std::vector<bool> isSlotsLive;
+    size_t liveSlots = 0;
+
 public:
-    std::vector<T> mStorage;
-    std::vector<bool> mValid;       // Quickly track if a component is valid
-    std::vector<size_t> mFreeList;  // Avoid scanning for free slots
+    Ticket Store(T& component);
+    Ticket Store(T&& component);
+
+    void Remove(Ticket ticket);
+
+    T& operator[](Ticket ticket);
+    const T& operator[](Ticket ticket) const;
+
+    bool IsValid(Ticket ticket) const;
+
+    size_t Size() const;
+
+    void Reserve(size_t capacity);
 };
 
 }  // namespace ECSEngine

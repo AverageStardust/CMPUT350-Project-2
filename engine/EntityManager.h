@@ -20,15 +20,15 @@ public:
     void AddComponent(EntityID entity, T component) {}
 
     template <typename T>
-    void RemoveComponent(EntityID entity, T component) {}
+    void RemoveComponent(EntityID entity) {}
 
     template <typename T>
-    bool HasComponent(EntityID entity, T component) const {
+    bool HasComponent(EntityID entity) const {
         return false;
     }
 
     template <typename T>
-    T& GetComponent(EntityID entity, T component) {
+    T& GetComponent(EntityID entity) {
         // Re-write code
         static T dummy;
         return dummy;
