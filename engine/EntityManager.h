@@ -1,9 +1,7 @@
 #pragma once
 
 #include <cassert>
-#include <iostream>
 #include <limits>
-#include <type_traits>
 
 #include "Component.h"
 #include "Entity.h"
@@ -22,15 +20,15 @@ public:
     void AddComponent(EntityID entity, T component) {}
 
     template <typename T>
-    void RemoveComponent(EntityID entity) {}
+    void RemoveComponent(EntityID entity, T component) {}
 
     template <typename T>
-    bool HasComponent(EntityID entity) const {
+    bool HasComponent(EntityID entity, T component) const {
         return false;
     }
 
     template <typename T>
-    T& GetComponent(EntityID entity) {
+    T& GetComponent(EntityID entity, T component) {
         // Re-write code
         static T dummy;
         return dummy;

@@ -12,7 +12,6 @@ struct TileType {
     char symbol;
     ECSEngine::SpriteID sprite;
     ECSEngine::Rect boundingBox;
-    bool hasBoundingBox;
 };
 
 std::ifstream& expectStr(std::ifstream& os, const std::string expected) {
@@ -80,9 +79,9 @@ bool ReadDictionaryLine(Engine& engine, std::ifstream& file, int dictionaryType,
         ECSEngine::Rect boundingBox;
         ReadRect(file, boundingBox);
         file >> std::ws;
-        dictionary[symbol] = TileType{symbol, spriteId, boundingBox, true};
+        dictionary[symbol] = TileType{symbol, spriteId, boundingBox};
     } else {
-        dictionary[symbol] = TileType{symbol, spriteId, {}, false};
+        dictionary[symbol] = TileType{symbol, spriteId, {}};
     }
 
     return true;
