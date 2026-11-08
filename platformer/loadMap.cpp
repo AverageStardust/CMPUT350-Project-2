@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "EntityManager.h"
+#include "LocationComponent.h"
 #include "MathUtil.h"
 #include "main.h"
 
@@ -105,7 +107,13 @@ std::unordered_map<char, TileType> ReadDictionary(Engine& engine, std::ifstream&
 }
 
 void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position) {
-    // TODO: do something with all this data
+    ECSEngine::EntityManager<COMPONENTS>& entityManager = engine.GetEntityManager();
+    ECSEngine::EntityID entity = entityManager.CreateEntity("Tile");
+
+    entityManager.AddComponent(entity, ECSEngine::LocationComponent{position});
+
+    // TODO: do something with type
+    (void)type;
 }
 
 void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, TileType>& dictonary) {

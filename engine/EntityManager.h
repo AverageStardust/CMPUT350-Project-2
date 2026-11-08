@@ -1,47 +1,56 @@
 #pragma once
 
 #include <cassert>
-#include <limits>
+#include <iostream>
 
-#include "Component.h"
 #include "Entity.h"
+#include "Storage.h"
 
 namespace ECSEngine {
-
 template <typename... Components>
 class EntityManager {
 public:
-    static constexpr size_t kNullComponent = std::numeric_limits<size_t>::max();
-    [[nodiscard]] EntityID CreateEntity(const std::string& name) { return 0; }
+    [[nodiscard]] EntityID CreateEntity(const std::string& name = "") {
+        return mEntities.Store(Entity<Components...>(name));
+    }
 
-    void RemoveEntity(EntityID entity) {}
+    void RemoveEntity(EntityID entity) {
+        (RemoveComponent<Components>(entity), ...);
+        mEntities.Remove(entity);
+    }
 
     template <typename T>
-    void AddComponent(EntityID entity, T component) {}
+    void AddComponent(EntityID entity, T component) {
+        Ticket componentID = GetComponentStorage<T>().Store(component);
+        mEntities.Get(entity).template GetComponetID<T>() = componentID;
+    }
 
     template <typename T>
-    void RemoveComponent(EntityID entity) {}
+    void RemoveComponent(EntityID entity) {
+        Ticket componentID = mEntities.Get(entity).template GetComponetID<T>();
+        if (componentID == NullComponent) return;
 
+        GetComponentStorage<T>().Remove(componentID);
+    }
     template <typename T>
     bool HasComponent(EntityID entity) const {
-        return false;
+        return mEntities.Get(entity).template GetComponetID<T>() != NullComponent;
     }
 
     template <typename T>
     T& GetComponent(EntityID entity) {
-        // Re-write code
-        static T dummy;
-        return dummy;
+        Ticket componentID = mEntities.Get(entity).template GetComponetID<T>();
+        return GetComponentStorage<T>().Get(componentID);
     }
 
     template <typename T>
-    ComponentStorage<T>& GetComponentStorage() {
-        // Re-write code
-        static ComponentStorage<T> dummy;
-        return dummy;
+    Storage<T>& GetComponentStorage() {
+        return std::get<Storage<T>>(mComponents);
     }
 
 private:
+    Storage<Entity<Components...>> mEntities;
+    std::tuple<Storage<Components>...> mComponents;
 };
 
 }  // namespace ECSEngine

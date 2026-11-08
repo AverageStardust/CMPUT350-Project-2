@@ -2,15 +2,6 @@
 
 #include <filesystem>
 
-#include "CameraSystem.h"
-#include "CollisionLateSystem.h"
-#include "CollisionSystem.h"
-#include "GravitySystem.h"
-#include "InputSystem.h"
-#include "MovementSystem.h"
-#include "ScoreSystem.h"
-#include "SpawnSystem.h"
-#include "SpriteSystem.h"
 #include "loadMap.h"
 
 std::string gResourcePath = "../assets/";

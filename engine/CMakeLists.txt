@@ -23,6 +23,7 @@ endif()
 
 set(ECS_ENGINE_FILES
     ECSEngine.h
+    Storage.h
     Entity.h
     Pack.h
     MathUtil.h MathUtil.cpp
@@ -30,7 +31,6 @@ set(ECS_ENGINE_FILES
 )
 
 set(ECS_COMPONENT_FILES
-    Component.h
     CameraComponent.h
     CollisionComponent.h
     InputComponent.h
@@ -53,7 +53,6 @@ set(ECS_SYSTEM_FILES
 )
 
 set(ECS_MANAGER_FILES
-    EntityManager.h
     SoundManager.h SoundManager.cpp
     SpriteManager.h SpriteManager.cpp
     SystemManager.h
