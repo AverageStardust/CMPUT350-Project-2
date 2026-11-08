@@ -25,7 +25,6 @@ set(ECS_ENGINE_FILES
     ECSEngine.h
     Storage.h
     Entity.h
-    Pack.h
     MathUtil.h MathUtil.cpp
     Keyboard.h
 )
