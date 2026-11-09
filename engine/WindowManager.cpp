@@ -1,5 +1,10 @@
 #include "WindowManager.h"
 
+#include "MathUtil.h"
+#include "SFML/Graphics/Color.hpp"
+#include "SFML/Graphics/RectangleShape.hpp"
+#include "SFML/System/Vector2.hpp"
+
 namespace ECSEngine {
 
 WindowManager::WindowManager(unsigned int width, unsigned int height, const std::string& title)
@@ -7,34 +12,77 @@ WindowManager::WindowManager(unsigned int width, unsigned int height, const std:
 
 std::shared_ptr<sf::RenderWindow> WindowManager::GetWindow() const { return mWindow; }
 
-Rect WindowManager::GetWindowBounds() const { return Rect(); }
+Point2D WindowManager::GetWindowSize() const {
+    sf::Vector2u size = mWindow->getSize();
+    return Point2D(size.x, size.y);
+}
 
-void WindowManager::DebugDrawRect(const Rect& r, int red, int green, int blue, int alpha) {}
+Rect WindowManager::GetWindowBounds() const {
+    sf::Vector2u size = mWindow->getSize();
+    return Rect(0, 0, size.x, size.y);
+}
 
-void WindowManager::DebugFrameRect(const Rect& r, int red, int green, int blue, int alpha) {}
+void WindowManager::DebugDrawRect(const Rect& rect, int red, int green, int blue, int alpha) {
+    Rect windowRect = WorldToWindow(rect);
 
-Rect WindowManager::WindowToWorld(const Rect& rect) const { return Rect(); }
+    sf::RectangleShape sfRect(windowRect.Size().AsSfmlVector());
+    sfRect.setPosition(windowRect.topLeft.AsSfmlVector());
+    sfRect.setFillColor(sf::Color(red, green, blue, alpha));
 
-Point2D WindowManager::WindowToWorld(const Point2D& pt) const { return Point2D(); }
+    mWindow->draw(sfRect);
+}
 
-Rect WindowManager::WorldToWindow(const Rect& rect) const { return Rect(); }
+void WindowManager::DebugFrameRect(const Rect& rect, int red, int green, int blue, int alpha) {
+    Rect windowRect = WorldToWindow(rect);
 
-Point2D WindowManager::WorldToWindow(const Point2D& pt) const { return Point2D(); }
+    sf::RectangleShape sfRect(windowRect.Size().AsSfmlVector());
+    sfRect.setPosition(windowRect.topLeft.AsSfmlVector());
+    sfRect.setFillColor(sf::Color::Transparent);
+    sfRect.setOutlineColor(sf::Color(red, green, blue, alpha));
+    sfRect.setOutlineThickness(std::max(1.0f, 1.0f / mWorldUnitsPerPixel));
 
-void WindowManager::SetCamera(const Point2D& worldPt, const Point2D& screenPt) {}
+    mWindow->draw(sfRect);
+}
 
-Point2D WindowManager::GetWorldCenter() const { return Point2D(); }
+Rect WindowManager::WindowToWorld(const Rect& rect) const {
+    if (!rect.Exists()) return rect;
+    return Rect(WindowToWorld(rect.topLeft), WindowToWorld(rect.bottomRight));
+}
 
-float WindowManager::GetWorldScale() const { return 1; }
+Point2D WindowManager::WindowToWorld(const Point2D& pt) const {
+    return ((pt - GetWindowSize() / 2.0f) * mWorldUnitsPerPixel) + mCameraPosition;
+}
 
-void WindowManager::SetWorldCenter(const Point2D& worldCenter) {}
+Rect WindowManager::WorldToWindow(const Rect& rect) const {
+    if (!rect.Exists()) return rect;
+    return Rect(WorldToWindow(rect.topLeft), WorldToWindow(rect.bottomRight));
+}
 
-void WindowManager::SetWorldScale(float worldUnitsPerPixel) {}
+Point2D WindowManager::WorldToWindow(const Point2D& pt) const {
+    return (pt - mCameraPosition) / mWorldUnitsPerPixel + GetWindowSize() / 2.0f;
+}
 
-void WindowManager::SetWorldRect(const Rect& worldCameraRect) {}
+Point2D WindowManager::GetWorldCenter() const { return mCameraPosition; }
 
-float WindowManager::WindowToWorld(float x) const { return 0; }
+float WindowManager::GetWorldScale() const { return mWorldUnitsPerPixel; }
 
-float WindowManager::WorldToWindow(float x) const { return 0; }
+void WindowManager::SetWorldCenter(const Point2D& worldCenter) { mCameraPosition = worldCenter; }
+
+void WindowManager::SetWorldScale(float worldUnitsPerPixel) {
+    mWorldUnitsPerPixel = worldUnitsPerPixel;
+}
+
+void WindowManager::SetWorldRect(const Rect& worldCameraRect) {
+    mCameraPosition = worldCameraRect.Center();
+    Point2D worldSize = worldCameraRect.Size();
+    Point2D windowSize = GetWindowSize();
+
+    // zoom out to capture entire worldCameraRect along both axies
+    mWorldUnitsPerPixel = std::max(worldSize.x / windowSize.x, worldSize.y / windowSize.y);
+}
+
+float WindowManager::WindowToWorld(float x) const { return x * mWorldUnitsPerPixel; }
+
+float WindowManager::WorldToWindow(float x) const { return x / mWorldUnitsPerPixel; }
 
 }  // namespace ECSEngine

@@ -51,7 +51,7 @@ struct Point2D {
     static float Cross(Point2D a, Point2D b);
 
 private:
-    friend class DrawContext;
+    friend class WindowManager;
     sf::Vector2f AsSfmlVector() const;
 };
 
