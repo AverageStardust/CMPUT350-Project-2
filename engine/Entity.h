@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <tuple>
 
@@ -21,11 +22,13 @@ struct ComponentSlot {
 
 template <typename... Components>
 class Entity {
+public:
+    EntityID GetID() const { return mID; }
+
 private:
     Entity() = default;
-    Entity(const std::string& name) : mName(name) {}
 
-    std::string mName;
+    EntityID mID;
     std::tuple<ComponentSlot<Components>...> mComponents{
         ComponentSlot<Components>{NullComponent}...};
 

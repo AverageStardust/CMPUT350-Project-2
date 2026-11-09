@@ -9,8 +9,14 @@ namespace ECSEngine {
 template <typename... Components>
 class EntityManager {
 public:
-    [[nodiscard]] EntityID CreateEntity(const std::string& name = "") {
-        return mEntities.Store(Entity<Components...>(name));
+    [[nodiscard]] EntityID CreateEntity() {
+        EntityID id = mEntities.Store(Entity<Components...>{});
+        mEntities[id].mID = id;
+        return id;
+    }
+
+    Entity<Components...>& GetEntity(EntityID entity) {
+        return mEntities.Get(entity);
     }
 
     void RemoveEntity(EntityID entity) {
@@ -21,24 +27,24 @@ public:
     template <typename T>
     void AddComponent(EntityID entity, T component) {
         Ticket componentID = GetComponentStorage<T>().Store(component);
-        mEntities.Get(entity).template GetComponetID<T>() = componentID;
+        GetEntity(entity).template GetComponetID<T>() = componentID;
     }
 
     template <typename T>
     void RemoveComponent(EntityID entity) {
-        Ticket componentID = mEntities.Get(entity).template GetComponetID<T>();
+        Ticket componentID = GetEntity(entity).template GetComponetID<T>();
         if (componentID == NullComponent) return;
 
         GetComponentStorage<T>().Remove(componentID);
     }
     template <typename T>
     bool HasComponent(EntityID entity) const {
-        return mEntities.Get(entity).template GetComponetID<T>() != NullComponent;
+        return GetEntity(entity).template GetComponetID<T>() != NullComponent;
     }
 
     template <typename T>
     T& GetComponent(EntityID entity) {
-        Ticket componentID = mEntities.Get(entity).template GetComponetID<T>();
+        Ticket componentID = GetEntity(entity).template GetComponetID<T>();
         return GetComponentStorage<T>().Get(componentID);
     }
 

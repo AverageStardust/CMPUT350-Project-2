@@ -12,23 +12,22 @@ namespace ECSEngine {
 using Ticket = uint64_t;
 static constexpr int64_t NullTicket = std::numeric_limits<uint64_t>::max();
 
-struct SplitTicket {
-    uint32_t index;
-    int32_t generation;
-};
-
-template <typename T>
-struct StorageSlot {
-    T value;
-    // >0 when live, <=0 when free, absolute value increases with each new value
-    int32_t generation = 0;
-};
-
 // generic iterable slot map
 // uses 32-bits per ticket as an index, and the remaining 32-bits as a generation number
 template <typename T>
 class Storage {
-    std::vector<StorageSlot<T>> slots;
+    struct SplitTicket {
+        uint32_t index;
+        int32_t generation;
+    };
+
+    struct StorageSlot {
+        T value;
+        // >0 when live, <=0 when free, absolute value increases with each new value
+        int32_t generation = 0;
+    };
+
+    std::vector<StorageSlot> slots;
     std::vector<uint32_t> freeSlots;
 
 public:
@@ -40,20 +39,24 @@ public:
         using pointer = T*;
         using reference = T&;
 
-        Iterator(Storage<T>& storage, int index) : mStorage(storage), mIndex(index) {
+        Iterator(Storage<T>& storage, uint32_t index) : mStorage(storage), mIndex(index) {
             // skip past empty slots
-            int size = mStorage.slots.size();
+            uint32_t size = mStorage.slots.size();
             while (mStorage.slots[mIndex].generation <= 0 && mIndex < size) mIndex++;
         }
 
-        reference operator*() const { return mStorage.slots[mIndex]; }
-        pointer operator->() { return *mStorage.slots[mIndex]; }
+        reference operator*() const { return mStorage.slots[mIndex].value; }
+        pointer operator->() { return *mStorage.slots[mIndex].value; }
+
+        Ticket GetTicket() {
+            return mStorage.joinTicket(SplitTicket{mIndex, mStorage.slots[mIndex].generation});
+        }
 
         Iterator& operator++() {
             mIndex++;
 
             // skip past empty slots
-            int size = mStorage.slots.size();
+            uint32_t size = mStorage.slots.size();
             while (mStorage.slots[mIndex].generation <= 0 && mIndex < size) mIndex++;
 
             return *this;
@@ -66,15 +69,15 @@ public:
         }
 
         friend bool operator==(const Iterator& a, const Iterator& b) {
-            return a.mIndex == b.mIndex && a.mStorage == b.mStorage;
+            return a.mIndex == b.mIndex && &a.mStorage == &b.mStorage;
         };
         friend bool operator!=(const Iterator& a, const Iterator& b) {
-            return a.mIndex != b.mIndex || a.mStorage != b.mStorage;
+            return a.mIndex != b.mIndex || &a.mStorage != &b.mStorage;
         };
 
     private:
         Storage<T>& mStorage;
-        int mIndex;
+        uint32_t mIndex;
     };
 
     Ticket Store(const T& value) { return storeInternal(value); }
@@ -84,7 +87,8 @@ public:
         SplitTicket splitTicket = cutTicket(ticket);
         if (!isValid(splitTicket)) return;
 
-        slots[splitTicket.index] = StorageSlot<T>{.value = T{}, .generation = -splitTicket.index};
+        // negate generation since it's becoming free
+        slots[splitTicket.index] = StorageSlot{.value = T{}, .generation = -splitTicket.generation};
 
         freeSlots.push_back(splitTicket.index);
     }
@@ -96,7 +100,18 @@ public:
         return slots[splitTicket.index].value;
     }
 
+    bool Get(Ticket ticket, T& result) {
+        SplitTicket splitTicket = cutTicket(ticket);
+        if (isValid(splitTicket)) {
+            result = slots[splitTicket.index].value;
+            return true;
+        }
+
+        return false;
+    }
+
     const T& Get(Ticket ticket) const { return Get(ticket); }
+    bool Get(Ticket ticket, const T& result) const { return Get(ticket, result); }
     T& operator[](Ticket ticket) { return Get(ticket); };
     const T& operator[](Ticket ticket) const { return Get(ticket); };
 
@@ -106,18 +121,17 @@ public:
 
     void Reserve(uint32_t capacity) { slots.reserve(capacity); }
 
-    Iterator begin() { return Iterator(this, 0); }
-
-    Iterator end() { return Iterator(this, slots.size()); }
+    Iterator begin() { return Iterator(*this, 0); }
+    Iterator end() { return Iterator(*this, slots.size()); }
 
 private:
     template <typename U>  // U is either T or T&
     Ticket storeInternal(U&& value) {
         if (freeSlots.size() == 0) {
             // fill new slot
-            slots.push_back(StorageSlot<T>{.value = value, .generation = 1});
+            slots.push_back(StorageSlot{.value = value, .generation = 1});
 
-            return slots.size() - 1;
+            return joinTicket(SplitTicket{(uint32_t)slots.size() - 1, 1});
         } else {
             // recycle slot
             uint32_t index = freeSlots[freeSlots.size() - 1];
@@ -128,9 +142,9 @@ private:
 
             // increment generation
             slots[index] =
-                StorageSlot<T>{.value = std::forward<U>(value), .generation = generation + 1};
+                StorageSlot{.value = std::forward<U>(value), .generation = generation + 1};
 
-            return joinTicket(SplitTicket{.index = index, .generation = generation});
+            return joinTicket(SplitTicket{index, generation});
         }
     }
 

@@ -108,7 +108,7 @@ std::unordered_map<char, TileType> ReadDictionary(Engine& engine, std::ifstream&
 
 void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position) {
     ECSEngine::EntityManager<COMPONENTS>& entityManager = engine.GetEntityManager();
-    ECSEngine::EntityID entity = entityManager.CreateEntity("Tile");
+    ECSEngine::EntityID entity = entityManager.CreateEntity();
 
     entityManager.AddComponent(entity, ECSEngine::LocationComponent{position});
 
