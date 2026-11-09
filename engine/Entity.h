@@ -23,6 +23,11 @@ struct ComponentSlot {
 template <typename... Components>
 class Entity {
 public:
+    template <typename T>
+    bool HasComponent() const {
+        return GetComponetID<T>() != NullComponent;
+    }
+
     EntityID GetID() const { return mID; }
 
 private:

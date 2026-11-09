@@ -37,15 +37,26 @@ public:
 
         GetComponentStorage<T>().Remove(componentID);
     }
+
+    template <typename T>
+    bool HasComponent(Entity<Components...> entity) const {
+        return entity.template GetComponetID<T>() != NullComponent;
+    }
+
     template <typename T>
     bool HasComponent(EntityID entity) const {
-        return GetEntity(entity).template GetComponetID<T>() != NullComponent;
+        return HasComponent(GetEntity(entity));
+    }
+
+    template <typename T>
+    T& GetComponent(Entity<Components...> entity) {
+        Ticket componentID = entity.template GetComponetID<T>();
+        return GetComponentStorage<T>().Get(componentID);
     }
 
     template <typename T>
     T& GetComponent(EntityID entity) {
-        Ticket componentID = GetEntity(entity).template GetComponetID<T>();
-        return GetComponentStorage<T>().Get(componentID);
+        return GetComponent<T>(GetEntity(entity));
     }
 
     template <typename T>

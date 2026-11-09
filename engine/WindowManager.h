@@ -32,7 +32,7 @@ public:
 
 private:
     std::shared_ptr<sf::RenderWindow> mWindow;
-    Point2D mCameraPosition;
+    Point2D mCameraPosition = {};
     float mWorldUnitsPerPixel = 1;
 };
 

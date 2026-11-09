@@ -1,6 +1,8 @@
 #pragma once
 
+#include "CollisionComponent.h"
 #include "EntityManager.h"
+#include "LocationComponent.h"
 #include "SoundManager.h"
 #include "SpriteManager.h"
 #include "SystemManager.h"
@@ -26,7 +28,32 @@ public:
         : mWindowManager(width, height, name) {};
     ~ECSEngine() {};
 
-    void Run() {};
+    void Run() {
+        std::shared_ptr<sf::RenderWindow> window = mWindowManager.GetWindow();
+        while (window->isOpen()) {
+            // check for events
+            while (const std::optional event = window->pollEvent()) {
+                if (event->is<sf::Event::Closed>()) window->close();
+            }
+
+            window->clear(sf::Color::Black);
+
+            for (Entity entity : mEntityManager) {
+                if (entity.template HasComponent<LocationComponent>() &&
+                    entity.template HasComponent<CollisionComponent>()) {
+                    LocationComponent& location =
+                        mEntityManager.template GetComponent<LocationComponent>(entity);
+                    CollisionComponent& collision =
+                        mEntityManager.template GetComponent<CollisionComponent>(entity);
+
+                    Rect rect = collision.localBoundingBox + location.loc;
+                    mWindowManager.DebugFrameRect(rect, 255, 0, 0, 0);
+                }
+            }
+
+            window->display();
+        }
+    };
 
     SoundManager& GetSoundManager() override { return mSoundManager; }
 
