@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cassert>
-#include <iostream>
 
 #include "Entity.h"
 #include "Storage.h"
@@ -47,6 +46,11 @@ public:
     Storage<T>& GetComponentStorage() {
         return std::get<Storage<T>>(mComponents);
     }
+
+    Storage<Entity<Components...>>::Iterator cbegin() const { return mEntities.begin(); }
+    Storage<Entity<Components...>>::Iterator cend() const { return mEntities.end(); }
+    Storage<Entity<Components...>>::Iterator begin() { return mEntities.begin(); }
+    Storage<Entity<Components...>>::Iterator end() { return mEntities.end(); }
 
 private:
     Storage<Entity<Components...>> mEntities;

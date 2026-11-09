@@ -21,7 +21,7 @@ struct ComponentSlot {
 
 template <typename... Components>
 class Entity {
-public: // TODO: MAKE PRIVATE
+private:
     Entity() = default;
     Entity(const std::string& name) : mName(name) {}
 
