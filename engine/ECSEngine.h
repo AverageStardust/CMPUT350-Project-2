@@ -34,7 +34,11 @@ public:
 
     void Run() {
         std::shared_ptr<sf::RenderWindow> window = mWindowManager.GetWindow();
+
         while (window->isOpen()) {
+            // cleanup old objects
+            mSoundManager.Cleanup();
+
             // check for events
             while (const std::optional event = window->pollEvent()) {
                 if (event->is<sf::Event::Closed>()) window->close();
@@ -44,12 +48,15 @@ public:
                 }
             }
 
+            // clear background
+            window->clear(sf::Color::Black);
+
+            // run systems
             if (!mSystemManager.Run(this)) {
                 window->close();
             }
 
-            window->clear(sf::Color::Black);
-
+            // draw entities (temperary for testings)
             for (Entity entity : mEntityManager) {
                 if (entity.template HasComponent<LocationComponent>() &&
                     entity.template HasComponent<CollisionComponent>()) {
@@ -64,6 +71,7 @@ public:
                 }
             }
 
+            // display window
             window->display();
         }
     };

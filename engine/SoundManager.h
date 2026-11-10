@@ -1,22 +1,36 @@
 #pragma once
 
+#include <vector>
+
+#include "SFML/Audio/Sound.hpp"
+#include "Storage.h"
 #include <SFML/Audio.hpp>
 
-#include <stdexcept>
-#include "Storage.h"
-
 namespace ECSEngine {
+
+using SoundID = Ticket;
 
 class SoundManager {
 public:
     SoundManager() = default;
     ~SoundManager() = default;
-    Ticket RegisterSound(const std::string& soundPath);
-    sf::Sound& GetSound(Ticket soundName);
-    void Play(Ticket soundName);
+    SoundID RegisterSound(const std::string& soundPath);
+
+    /*
+     * The callee is responsible to keep the sound in memory until it's finished, and then free it.
+     * If you don't want this, use Play( ) instead
+     */
+    sf::Sound GetSound(SoundID soundName);
+    void Play(SoundID soundName);
 
 private:
-    Storage<std::string> managedSounds;
+    Storage<sf::SoundBuffer> managedSounds;
+    std::vector<sf::Sound> playingSounds;
+
+    void Cleanup();
+
+    template <typename... Any>
+    friend class ECSEngine;
 };
 
 }  // namespace ECSEngine

@@ -1,10 +1,16 @@
 #include "main.h"
 
 #include <filesystem>
+#include <string>
 
+#include "SoundManager.h"
 #include "loadMap.h"
 
 std::string gResourcePath = "../assets/";
+
+std::string resourcePath(std::string path) {
+    return std::filesystem::path{gResourcePath}.concat(path);
+}
 
 int main(int argc, char* argv[]) {
     if (argc >= 3 && argv[1] == std::string("-path")) {
@@ -20,10 +26,13 @@ int main(int argc, char* argv[]) {
     Engine engine(1024, 768, "Test Engine");
 
     // Load sounds
+    auto& som = engine.GetSoundManager();
+    ECSEngine::SoundID testSound =
+        som.RegisterSound(resourcePath("sfx_gem.ogg"));
 
     // Load maps
-    LoadMap(engine, std::filesystem::path{gResourcePath}.concat("sky.map"));
-    LoadMap(engine, std::filesystem::path{gResourcePath}.concat("testWorld.map"));
+    LoadMap(engine, resourcePath("sky.map"));
+    LoadMap(engine, resourcePath("world.map"));
 
     // Place player
 
@@ -43,6 +52,7 @@ int main(int argc, char* argv[]) {
     sm.AddSystem(std::make_unique<ECSEngine::SpriteSystem<COMPONENTS>>());
     sm.AddSystem(std::make_unique<ECSEngine::SpawnSystem<COMPONENTS>>());
 
+    som.Play(testSound);
     engine.Run();
     return 0;
 }
