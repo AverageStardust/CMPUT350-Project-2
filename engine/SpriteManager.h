@@ -21,7 +21,8 @@ public:
     [[nodiscard]] Ticket RegisterTexture(const std::string& texturePath, const Rect& sourceRect);
     sf::Sprite& GetSprite(Ticket id);
 
-    Storage<std::pair<std::string, Rect>> managedSprites;
+    Storage<sf::Texture> managedTextures;
+    Storage<sf::Sprite> managedSprites;
 
 private:
 };
