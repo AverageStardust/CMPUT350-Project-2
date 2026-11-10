@@ -15,31 +15,41 @@ public:
         return id;
     }
 
-    Entity<Components...>& GetEntity(EntityID entity) {
-        return mEntities.Get(entity);
-    }
+    Entity<Components...>& GetEntity(EntityID entity) { return mEntities.Get(entity); }
 
     void RemoveEntity(EntityID entity) {
         (RemoveComponent<Components>(entity), ...);
         mEntities.Remove(entity);
     }
 
+    void RemoveEntity(Entity<Components...>& entity) { RemoveEntity(entity.GetID()); }
+
     template <typename T>
-    void AddComponent(EntityID entity, T component) {
+    void AddComponent(Entity<Components...>& entity, T component) {
         Ticket componentID = GetComponentStorage<T>().Store(component);
-        GetEntity(entity).template GetComponetID<T>() = componentID;
+        entity.template GetComponetID<T>() = componentID;
     }
 
     template <typename T>
-    void RemoveComponent(EntityID entity) {
-        Ticket componentID = GetEntity(entity).template GetComponetID<T>();
+    void AddComponent(EntityID entity, T component) {
+        AddComponent(GetEntity(entity), component);
+    }
+
+    template <typename T>
+    void RemoveComponent(Entity<Components...>& entity) {
+        Ticket componentID = entity.template GetComponetID<T>();
         if (componentID == NullComponent) return;
 
         GetComponentStorage<T>().Remove(componentID);
     }
 
     template <typename T>
-    bool HasComponent(Entity<Components...> entity) const {
+    void RemoveComponent(EntityID entity) {
+        RemoveComponent<T>(GetEntity(entity));
+    }
+
+    template <typename T>
+    bool HasComponent(Entity<Components...>& entity) const {
         return entity.template GetComponetID<T>() != NullComponent;
     }
 
@@ -49,7 +59,7 @@ public:
     }
 
     template <typename T>
-    T& GetComponent(Entity<Components...> entity) {
+    T& GetComponent(Entity<Components...>& entity) {
         Ticket componentID = entity.template GetComponetID<T>();
         return GetComponentStorage<T>().Get(componentID);
     }

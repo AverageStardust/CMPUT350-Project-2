@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
 #include <tuple>
 
 #include "Storage.h"
@@ -39,6 +37,11 @@ private:
 
     template <typename T>
     Ticket& GetComponetID() {
+        return std::get<ComponentSlot<T>>(mComponents).componentID;
+    }
+
+    template <typename T>
+    const Ticket& GetComponetID() const {
         return std::get<ComponentSlot<T>>(mComponents).componentID;
     }
 

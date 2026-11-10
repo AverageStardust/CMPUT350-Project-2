@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "CollisionComponent.h"
 #include "EntityManager.h"
 #include "LocationComponent.h"
 #include "MathUtil.h"
@@ -112,8 +113,9 @@ void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position) {
 
     entityManager.AddComponent(entity, ECSEngine::LocationComponent{position});
 
-    // TODO: do something with type
-    (void)type;
+    if (type.boundingBox.Exists())
+        entityManager.AddComponent(
+            entity, ECSEngine::CollisionComponent{.localBoundingBox = type.boundingBox});
 }
 
 void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, TileType>& dictonary) {
@@ -137,7 +139,7 @@ void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, TileT
 
     for (int y = 0; y < mapSize.y; y++) {
         for (int x = 0; x < mapSize.x; x++) {
-            ECSEngine::Point2D position = origin + tileStride * ECSEngine::Point2D(x, y);
+            ECSEngine::Point2D position = origin + tileStride.PairwiseMult(ECSEngine::Point2D(x, y));
 
             char symbol;
             file >> symbol;

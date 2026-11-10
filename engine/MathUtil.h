@@ -35,6 +35,7 @@ struct Point2D {
     Point2D Max(Point2D other) const;
     Point2D Abs() const;
     Point2D Sign() const;
+    Point2D PairwiseMult(Point2D other) const;
     float Dot(Point2D other) const;
     float Cross(Point2D other) const;
     float Distance(const Point2D& other) const;
@@ -47,6 +48,7 @@ struct Point2D {
     Point2D Perpendicular() const;
     float Length() const;
     float LengthSq() const;
+    static Point2D PairwiseMult(Point2D a, Point2D b);
     static float Dot(Point2D a, Point2D b);
     static float Cross(Point2D a, Point2D b);
 

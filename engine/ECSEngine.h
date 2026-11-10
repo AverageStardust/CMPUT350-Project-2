@@ -3,6 +3,8 @@
 #include "CollisionComponent.h"
 #include "EntityManager.h"
 #include "LocationComponent.h"
+#include "SFML/System/Vector2.hpp"
+#include "SFML/Window/Event.hpp"
 #include "SoundManager.h"
 #include "SpriteManager.h"
 #include "SystemManager.h"
@@ -34,6 +36,10 @@ public:
             // check for events
             while (const std::optional event = window->pollEvent()) {
                 if (event->is<sf::Event::Closed>()) window->close();
+                if (event->is<sf::Event::MouseMoved>()) {
+                    sf::Vector2i pos = event->getIf<sf::Event::MouseMoved>()->position;
+                    mWindowManager.SetWorldCenter({(float)pos.x, (float)pos.y});
+                }
             }
 
             window->clear(sf::Color::Black);
@@ -47,7 +53,8 @@ public:
                         mEntityManager.template GetComponent<CollisionComponent>(entity);
 
                     Rect rect = collision.localBoundingBox + location.loc;
-                    mWindowManager.DebugFrameRect(rect, 255, 0, 0, 0);
+
+                    mWindowManager.DebugFrameRect(rect, 255, 0, 0, 255);
                 }
             }
 

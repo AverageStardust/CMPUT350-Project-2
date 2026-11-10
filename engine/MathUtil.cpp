@@ -56,6 +56,7 @@ Point2D Point2D::Max(Point2D other) const {
 }
 Point2D Point2D::Abs() const { return Point2D(std::abs(x), std::abs(y)); }
 Point2D Point2D::Sign() const { return Point2D((x > 0) ? 1 : -1, (y > 0) ? 1 : -1); }
+Point2D Point2D::PairwiseMult(Point2D other) const { return {x * other.x, y * other.y}; }
 float Point2D::Dot(Point2D other) const { return x * other.x + y * other.y; }
 float Point2D::Cross(Point2D other) const { return x * other.y - y * other.x; }
 float Point2D::Distance(const Point2D& other) const {
@@ -84,6 +85,7 @@ Point2D Point2D::Rotated(float thetaRadians) const {
 Point2D Point2D::Perpendicular() const { return Point2D(-y, x); }
 float Point2D::Length() const { return hypot(x, y); }
 float Point2D::LengthSq() const { return x * x + y * y; }
+Point2D Point2D::PairwiseMult(Point2D a, Point2D b) { return {a.x * b.x, a.y * b.y}; }
 float Point2D::Dot(Point2D a, Point2D b) { return a.x * b.x + a.y * b.y; }
 float Point2D::Cross(Point2D a, Point2D b) { return a.x * b.y - a.y * b.x; }
 
@@ -367,7 +369,11 @@ bool Rect::Intersects(const Quad& other, Point2D& point) const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Rect& r) {
-    os << "(" << r.topLeft << ", " << r.bottomRight << ")";
+    if (r.Exists()) {
+        os << "(" << r.topLeft << ", " << r.bottomRight << ")";
+    } else {
+        os << "(Null Rect)";
+    }
     return os;
 }
 
