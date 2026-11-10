@@ -25,8 +25,8 @@ Rect WindowManager::GetWindowBounds() const {
 void WindowManager::DebugDrawRect(const Rect& rect, int red, int green, int blue, int alpha) {
     Rect windowRect = WorldToWindow(rect);
 
-    sf::RectangleShape sfRect(windowRect.Size().AsSfmlVector());
-    sfRect.setPosition(windowRect.topLeft.AsSfmlVector());
+    sf::RectangleShape sfRect(windowRect.Size().AsSfmlVectorF());
+    sfRect.setPosition(windowRect.topLeft.AsSfmlVectorF());
     sfRect.setFillColor(sf::Color(red, green, blue, alpha));
 
     mWindow->draw(sfRect);
@@ -35,8 +35,8 @@ void WindowManager::DebugDrawRect(const Rect& rect, int red, int green, int blue
 void WindowManager::DebugFrameRect(const Rect& rect, int red, int green, int blue, int alpha) {
     Rect windowRect = WorldToWindow(rect);
 
-    sf::RectangleShape sfRect(windowRect.Size().AsSfmlVector());
-    sfRect.setPosition(windowRect.topLeft.AsSfmlVector());
+    sf::RectangleShape sfRect(windowRect.Size().AsSfmlVectorF());
+    sfRect.setPosition(windowRect.topLeft.AsSfmlVectorF());
     sfRect.setFillColor(sf::Color::Transparent);
     sfRect.setOutlineColor(sf::Color(red, green, blue, alpha));
     sfRect.setOutlineThickness(std::max(1.0f, 1.0f / mWorldUnitsPerPixel));

@@ -2,9 +2,14 @@
 
 #include <iostream>
 
+#include "SFML/Graphics/Rect.hpp"
 #include "SFML/System/Vector2.hpp"
 
 namespace ECSEngine {
+
+struct Circle;
+struct Rect;
+struct Quad;
 
 struct Point2D {
     float x, y;
@@ -54,15 +59,13 @@ struct Point2D {
 
 private:
     friend class WindowManager;
-    sf::Vector2f AsSfmlVector() const;
+    friend struct Rect;
+    sf::Vector2f AsSfmlVectorF() const;
+    sf::Vector2i AsSfmlVectorI() const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Point2D& p);
 Point2D operator*(float scalar, const Point2D& point);
-
-struct Circle;
-struct Rect;
-struct Quad;
 
 struct Line {
     Point2D p1, p2;
@@ -119,7 +122,7 @@ struct Rect {
     Rect operator|(const Rect& other) const;
     Rect operator|(const Quad& other) const;
     Rect operator&(const Rect& other) const;
-    Rect operator+(const Point2D &other) const;
+    Rect operator+(const Point2D& other) const;
 
     Rect& operator|=(const Point2D& other);
     Rect& operator|=(const Line& other);
@@ -127,7 +130,7 @@ struct Rect {
     Rect& operator|=(const Quad& other);
     Rect& operator&=(const Rect& other);
 
-    Rect& operator+=(const Point2D &other);
+    Rect& operator+=(const Point2D& other);
 
     void Inset(int inset);
     Rect Inseted(int inset) const;
@@ -142,6 +145,11 @@ struct Rect {
     bool Intersects(const Circle& other, Point2D& point) const;
     bool Intersects(const Rect& other, Point2D& point) const;
     bool Intersects(const Quad& other, Point2D& point) const;
+
+private:
+    friend class SpriteManager;
+    sf::FloatRect AsSfmlRectF() const;
+    sf::IntRect AsSfmlRectI() const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Rect& r);

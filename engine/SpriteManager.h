@@ -1,14 +1,11 @@
 #pragma once
 
 #include <unordered_map>
-#include <utility>
 
 #include "MathUtil.h"
+#include "Storage.h"
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
-
-#include <stdexcept>
-#include "Storage.h"
 
 namespace ECSEngine {
 
@@ -21,7 +18,7 @@ public:
     [[nodiscard]] Ticket RegisterTexture(const std::string& texturePath, const Rect& sourceRect);
     sf::Sprite& GetSprite(Ticket id);
 
-    Storage<sf::Texture> managedTextures;
+    std::unordered_map<std::string, sf::Texture> managedTextures;
     Storage<sf::Sprite> managedSprites;
 
 private:

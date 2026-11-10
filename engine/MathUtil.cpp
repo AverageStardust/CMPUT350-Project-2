@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "SFML/Graphics/Rect.hpp"
+
 namespace ECSEngine {
 
 Point2D Point2D::operator+(const Point2D& other) const { return Point2D(x + other.x, y + other.y); }
@@ -89,7 +91,8 @@ Point2D Point2D::PairwiseMult(Point2D a, Point2D b) { return {a.x * b.x, a.y * b
 float Point2D::Dot(Point2D a, Point2D b) { return a.x * b.x + a.y * b.y; }
 float Point2D::Cross(Point2D a, Point2D b) { return a.x * b.y - a.y * b.x; }
 
-sf::Vector2f Point2D::AsSfmlVector() const { return sf::Vector2f(x, y); }
+sf::Vector2f Point2D::AsSfmlVectorF() const { return sf::Vector2f(x, y); }
+sf::Vector2i Point2D::AsSfmlVectorI() const { return sf::Vector2i(x, y); }
 
 std::ostream& operator<<(std::ostream& os, const Point2D& p) {
     os << "(" << p.x << ", " << p.y << ")";
@@ -366,6 +369,13 @@ bool Rect::Intersects(const Rect& other, Point2D& point) const {
 }
 bool Rect::Intersects(const Quad& other, Point2D& point) const {
     return Quad(*this).Intersects(other, point);
+}
+
+sf::FloatRect Rect::AsSfmlRectF() const {
+    return sf::FloatRect(topLeft.AsSfmlVectorF(), Size().AsSfmlVectorF());
+}
+sf::IntRect Rect::AsSfmlRectI() const {
+    return sf::IntRect(topLeft.AsSfmlVectorI(), Size().AsSfmlVectorI());
 }
 
 std::ostream& operator<<(std::ostream& os, const Rect& r) {
