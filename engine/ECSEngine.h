@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdlib>
+
 #include "CollisionComponent.h"
 #include "EntityManager.h"
 #include "LocationComponent.h"
@@ -40,6 +42,10 @@ public:
                     sf::Vector2i pos = event->getIf<sf::Event::MouseMoved>()->position;
                     mWindowManager.SetWorldCenter({(float)pos.x, (float)pos.y});
                 }
+            }
+
+            if (!mSystemManager.Run(this)) {
+                window->close();
             }
 
             window->clear(sf::Color::Black);
