@@ -270,6 +270,17 @@ Rect Rect::operator+(const Point2D& other) const {
     }
 }
 
+Rect Rect::operator-(const Point2D& other) const {
+    if (Exists()) {
+        Rect result;
+        result.topLeft = topLeft - other;
+        result.bottomRight = bottomRight - other;
+        return result;
+    } else {
+        return *this;
+    }
+}
+
 Rect& Rect::operator|=(const Point2D& other) {
     if (Exists()) {
         topLeft = topLeft.Min(other);
@@ -315,8 +326,17 @@ Rect& Rect::operator&=(const Rect& other) {
 
 Rect& Rect::operator+=(const Point2D& other) {
     if (Exists()) {
-        topLeft = other;
+        topLeft += other;
         bottomRight += other;
+    }
+
+    return *this;
+}
+
+Rect& Rect::operator-=(const Point2D& other) {
+    if (Exists()) {
+        topLeft -= other;
+        bottomRight -= other;
     }
 
     return *this;

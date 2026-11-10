@@ -123,6 +123,7 @@ struct Rect {
     Rect operator|(const Quad& other) const;
     Rect operator&(const Rect& other) const;
     Rect operator+(const Point2D& other) const;
+    Rect operator-(const Point2D& other) const;
 
     Rect& operator|=(const Point2D& other);
     Rect& operator|=(const Line& other);
@@ -131,6 +132,7 @@ struct Rect {
     Rect& operator&=(const Rect& other);
 
     Rect& operator+=(const Point2D& other);
+    Rect& operator-=(const Point2D& other);
 
     void Inset(int inset);
     Rect Inseted(int inset) const;

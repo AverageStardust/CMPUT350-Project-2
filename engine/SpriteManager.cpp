@@ -2,7 +2,7 @@
 
 namespace ECSEngine {
 
-Ticket SpriteManager::RegisterTexture(const std::string& texturePath, const Rect& sourceRect) {
+Ticket SpriteManager::RegisterSprite(const std::string& texturePath, const Rect& sourceRect) {
     sf::Texture texture;
 
     if (managedTextures.contains(texturePath)) {

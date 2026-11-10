@@ -9,14 +9,17 @@
 #include "EntityManager.h"
 #include "LocationComponent.h"
 #include "MathUtil.h"
-#include "main.h"
-
+#include "SpriteComponent.h"
+#include "SpriteManager.h"
 #include "Storage.h"
+#include "main.h"
+#include "resource.h"
 
 struct TileType {
     char symbol;
-    ECSEngine::Ticket sprite;
-    ECSEngine::Rect boundingBox;
+    ECSEngine::SpriteID spriteID;
+    ECSEngine::Rect spriteBounds;
+    ECSEngine::Rect collisionBounds;
 };
 
 std::ifstream& expectStr(std::ifstream& os, const std::string expected) {
@@ -73,20 +76,22 @@ bool ReadDictionaryLine(Engine& engine, std::ifstream& file, int dictionaryType,
         throw std::runtime_error("Unexpected end of line");
     }
 
-    ECSEngine::Rect sheetLocation;
-    ReadRect(file, sheetLocation);
+    ECSEngine::Rect sheetBounds;
+    ReadRect(file, sheetBounds);
     file >> std::ws;
 
+    ECSEngine::Rect spriteBounds = sheetBounds - sheetBounds.topLeft;
+
     ECSEngine::Ticket spriteId =
-        engine.GetSpriteManager().RegisterTexture(sheetPath, sheetLocation);
+        engine.GetSpriteManager().RegisterSprite(resourcePath(sheetPath), sheetBounds);
 
     if (dictionaryType == 2) {
-        ECSEngine::Rect boundingBox;
-        ReadRect(file, boundingBox);
+        ECSEngine::Rect collisionBounds;
+        ReadRect(file, collisionBounds);
         file >> std::ws;
-        dictionary[symbol] = TileType{symbol, spriteId, boundingBox};
+        dictionary[symbol] = TileType{symbol, spriteId, spriteBounds, collisionBounds};
     } else {
-        dictionary[symbol] = TileType{symbol, spriteId, {}};
+        dictionary[symbol] = TileType{symbol, spriteId, spriteBounds, {}};
     }
 
     return true;
@@ -115,9 +120,16 @@ void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position) {
 
     entityManager.AddComponent(entity, ECSEngine::LocationComponent{position});
 
-    if (type.boundingBox.Exists())
+    entityManager.AddComponent(entity, ECSEngine::SpriteComponent{
+                                           .textureID = type.spriteID,
+                                           .bounds = type.spriteBounds,
+                                           .worldSpace = true,
+                                       });
+
+    if (type.collisionBounds.Exists()) {
         entityManager.AddComponent(
-            entity, ECSEngine::CollisionComponent{.localBoundingBox = type.boundingBox});
+            entity, ECSEngine::CollisionComponent{.localBoundingBox = type.collisionBounds});
+    }
 }
 
 void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, TileType>& dictonary) {
@@ -141,7 +153,8 @@ void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, TileT
 
     for (int y = 0; y < mapSize.y; y++) {
         for (int x = 0; x < mapSize.x; x++) {
-            ECSEngine::Point2D position = origin + tileStride.PairwiseMult(ECSEngine::Point2D(x, y));
+            ECSEngine::Point2D position =
+                origin + tileStride.PairwiseMult(ECSEngine::Point2D(x, y));
 
             char symbol;
             file >> symbol;

@@ -15,7 +15,7 @@ class SpriteManager {
 public:
     SpriteManager() = default;
     ~SpriteManager() = default;
-    [[nodiscard]] Ticket RegisterTexture(const std::string& texturePath, const Rect& sourceRect);
+    [[nodiscard]] Ticket RegisterSprite(const std::string& texturePath, const Rect& sourceRect);
     sf::Sprite& GetSprite(Ticket id);
 
     std::unordered_map<std::string, sf::Texture> managedTextures;
