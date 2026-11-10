@@ -11,9 +11,11 @@
 #include "MathUtil.h"
 #include "main.h"
 
+#include "Storage.h"
+
 struct TileType {
     char symbol;
-    ECSEngine::SpriteID sprite;
+    ECSEngine::Ticket sprite;
     ECSEngine::Rect boundingBox;
 };
 
@@ -75,7 +77,7 @@ bool ReadDictionaryLine(Engine& engine, std::ifstream& file, int dictionaryType,
     ReadRect(file, sheetLocation);
     file >> std::ws;
 
-    ECSEngine::SpriteID spriteId =
+    ECSEngine::Ticket spriteId =
         engine.GetSpriteManager().RegisterTexture(sheetPath, sheetLocation);
 
     if (dictionaryType == 2) {

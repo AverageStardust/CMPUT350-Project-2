@@ -2,16 +2,21 @@
 
 #include <SFML/Audio.hpp>
 
+#include <stdexcept>
+#include "Storage.h"
+
 namespace ECSEngine {
 
 class SoundManager {
 public:
     SoundManager() = default;
     ~SoundManager() = default;
-    void RegisterSound(const std::string& soundPath, const std::string& soundName);
-    sf::Sound& GetSound(const std::string& soundName);
+    Ticket RegisterSound(const std::string& soundPath);
+    sf::Sound& GetSound(Ticket soundName);
+    void Play(Ticket soundName);
 
 private:
+    Storage<std::string> managedSounds;
 };
 
 }  // namespace ECSEngine
