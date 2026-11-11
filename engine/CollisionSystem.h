@@ -32,7 +32,18 @@ public:
                         CollisionComponent& innerCollisionComp = em.template GetComponent<CollisionComponent>(innerEntity);
 
                         if (outerCollisionComp.worldBoundingBox.IsOverlapping(innerCollisionComp.worldBoundingBox)) {
-                            // TODO: tell entities they're colliding
+                            // TODO: resoolve collisions
+
+                            // Handle obstacles
+                            if ((outerCollisionComp.doesDamage || innerCollisionComp.doesDamage) /*&& one is player*/) {
+
+                            }
+
+                            // Handle collectibles?
+
+                            // Handle ground
+                            // Handle walls
+                            // Handle ceiling
                         }
                     }
                 }
