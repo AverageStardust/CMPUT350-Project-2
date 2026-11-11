@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "SpriteComponent.h"
 #include "SystemManager.h"
 #include "EntityManager.h"
 #include "LocationComponent.h"

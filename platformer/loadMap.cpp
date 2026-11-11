@@ -18,7 +18,6 @@
 struct TileType {
     char symbol;
     ECSEngine::SpriteID spriteID;
-    ECSEngine::Rect spriteBounds;
     ECSEngine::Rect collisionBounds;
 };
 
@@ -80,8 +79,6 @@ bool ReadDictionaryLine(Engine& engine, std::ifstream& file, int dictionaryType,
     ReadRect(file, sheetBounds);
     file >> std::ws;
 
-    ECSEngine::Rect spriteBounds = sheetBounds - sheetBounds.topLeft;
-
     ECSEngine::Ticket spriteId =
         engine.GetSpriteManager().RegisterSprite(resourcePath(sheetPath), sheetBounds);
 
@@ -89,9 +86,9 @@ bool ReadDictionaryLine(Engine& engine, std::ifstream& file, int dictionaryType,
         ECSEngine::Rect collisionBounds;
         ReadRect(file, collisionBounds);
         file >> std::ws;
-        dictionary[symbol] = TileType{symbol, spriteId, spriteBounds, collisionBounds};
+        dictionary[symbol] = TileType{symbol, spriteId, collisionBounds};
     } else {
-        dictionary[symbol] = TileType{symbol, spriteId, spriteBounds, {}};
+        dictionary[symbol] = TileType{symbol, spriteId, {}};
     }
 
     return true;
@@ -122,7 +119,6 @@ void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position) {
 
     entityManager.AddComponent(entity, ECSEngine::SpriteComponent{
                                            .spriteID = type.spriteID,
-                                           .bounds = type.spriteBounds,
                                            .worldSpace = true,
                                        });
 

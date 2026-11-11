@@ -1,9 +1,5 @@
 #pragma once
 
-#include <bitset>
-#include <unordered_map>
-
-#include "MathUtil.h"
 #include "SpriteManager.h"
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -15,7 +11,6 @@ namespace ECSEngine {
 class SpriteComponent {
 public:
     SpriteID spriteID;
-    Rect bounds;
     bool worldSpace;  // If false, this sprite is drawn in screen space instead of world space
 private:
 };

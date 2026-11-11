@@ -45,15 +45,12 @@ void WindowManager::DebugFrameRect(const Rect& rect, int red, int green, int blu
     mWindow->draw(sfRect);
 }
 
-void WindowManager::DrawSpriteWorld(sf::Sprite& sprite, Rect bounds) {
-    DrawSpriteWindow(sprite, bounds);
+void WindowManager::DrawSpriteWorld(sf::Sprite& sprite, Point2D position) {
+    DrawSpriteWindow(sprite, WorldToWindow(position));
 }
 
-void WindowManager::DrawSpriteWindow(sf::Sprite& sprite, Rect bounds) {
-    sprite.setPosition(bounds.topLeft.AsSfmlVectorF());
-
-    Point2D textureSize = sprite.getTextureRect().size;
-    sprite.setScale(bounds.Size().PairwiseDiv(textureSize).AsSfmlVectorF());
+void WindowManager::DrawSpriteWindow(sf::Sprite& sprite, Point2D position) {
+    sprite.setPosition(position.AsSfmlVectorF());
 
     mWindow->draw(sprite);
 }

@@ -33,12 +33,11 @@ public:
                     em.template GetComponent<LocationComponent>(entity);
                 SpriteComponent& spriteComp = em.template GetComponent<SpriteComponent>(entity);
 
+                sf::Sprite sprite = sm.GetSprite(spriteComp.spriteID);
                 if (spriteComp.worldSpace) {
-                    wm.DrawSpriteWorld(sm.GetSprite(spriteComp.spriteID),
-                                       spriteComp.bounds + locationComp.loc);
+                    wm.DrawSpriteWorld(sprite, locationComp.loc);
                 } else {
-                    wm.DrawSpriteWindow(sm.GetSprite(spriteComp.spriteID),
-                                        spriteComp.bounds + locationComp.loc);
+                    wm.DrawSpriteWindow(sprite, locationComp.loc);
                 }
             }
         }

@@ -26,15 +26,12 @@ public:
 
         for (Entity entity : em) {
             if (entity.template HasComponent<CollisionComponent>() &&
-                entity.template HasComponent<LocationComponent>() &&
-                entity.template HasComponent<SpriteComponent>()) {
+                entity.template HasComponent<LocationComponent>()) {
 
                 LocationComponent& locationComp = em.template GetComponent<LocationComponent>(entity);
                 CollisionComponent& collisionComp = em.template GetComponent<CollisionComponent>(entity);
-                SpriteComponent& spriteComp = em.template GetComponent<SpriteComponent>(entity);
 
-                collisionComp.localBoundingBox = spriteComp.bounds;
-                collisionComp.worldBoundingBox = Rect(locationComp.loc, spriteComp.bounds.Width(), spriteComp.bounds.Height());
+                collisionComp.worldBoundingBox = collisionComp.localBoundingBox + locationComp.loc;
             }
         }
 

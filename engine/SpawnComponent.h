@@ -10,7 +10,6 @@ namespace ECSEngine {
 class SpawnComponent {
 public:
     EntityID entityID;  // The entity that this spawn component is attached to
-    std::string spawnType;
     SpriteID spawnTextureID;
     int timeToNextSpawn;
     int timeBetweenSpawns;  // in frames
