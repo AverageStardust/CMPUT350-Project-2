@@ -30,7 +30,7 @@ public:
                 LocationComponent& locationComp = em.template GetComponent<LocationComponent>(entity);
                 CollisionComponent& collisionComp = em.template GetComponent<CollisionComponent>(entity);
 
-                collisionComp.worldBoundingBox = collisionComp.localBoundingBox + locationComp.loc;
+                collisionComp.worldBounds = collisionComp.localBounds + locationComp.loc;
             }
         }
 

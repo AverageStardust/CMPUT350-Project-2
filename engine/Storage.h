@@ -92,16 +92,6 @@ public:
         freeSlots.push_back(splitTicket.index);
     }
 
-    bool Get(Ticket ticket, const T& result) const {
-        SplitTicket splitTicket = cutTicket(ticket);
-        if (isValid(splitTicket)) {
-            result = slots[splitTicket.index].value;
-            return true;
-        }
-
-        return false;
-    }
-
     const T& Get(Ticket ticket) const {
         SplitTicket splitTicket = cutTicket(ticket);
         assert(isValid(splitTicket));
@@ -113,10 +103,6 @@ public:
 
     T& Get(Ticket ticket) {
         return const_cast<T&>(const_cast<const Storage<T>*>(this)->Get(ticket));
-    }
-
-    bool Get(Ticket ticket, T& result) {
-        return const_cast<const Storage<T>*>(this)->Get(ticket, const_cast<T&>(result));
     }
 
     T& operator[](Ticket ticket) { return Get(ticket); };

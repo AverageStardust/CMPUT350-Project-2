@@ -1,6 +1,7 @@
 #include "MathUtil.h"
 
 #include <algorithm>
+#include <cmath>
 
 #include "SFML/Graphics/Rect.hpp"
 
@@ -365,6 +366,10 @@ float Rect::Width() const {
 float Rect::Height() const {
     if (!Exists()) return 0;
     return bottomRight.y - topLeft.y;
+}
+float Rect::Area() const {
+    if (!Exists()) return 0;
+    return Width() * Height();
 }
 Point2D Rect::Size() const {
     if (!Exists()) return {};

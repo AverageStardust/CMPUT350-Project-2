@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 
     // Load maps
     LoadMap(engine, resourcePath("sky.map"));
-    LoadMap(engine, resourcePath("world.map"));
+    LoadMap(engine, resourcePath("testWorld.map"));
 
     // Place player
     auto& em = engine.GetEntityManager();

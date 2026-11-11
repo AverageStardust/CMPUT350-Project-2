@@ -142,6 +142,7 @@ struct Rect {
     float Width() const;
     float Height() const;
     Point2D Size() const;
+    float Area() const;
     Point2D Center() const;
     bool Exists() const;
     bool Intersects(const Line& other, Point2D& point) const;

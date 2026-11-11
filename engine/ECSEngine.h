@@ -82,7 +82,7 @@ private:
                 CollisionComponent& collision =
                     mEntityManager.template GetComponent<CollisionComponent>(entity);
 
-                Rect rect = collision.localBoundingBox + location.loc;
+                Rect rect = collision.localBounds + location.loc;
 
                 mWindowManager.DebugFrameRect(rect, 255, 0, 0, 255);
             }

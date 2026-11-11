@@ -10,13 +10,14 @@
 namespace ECSEngine {
 
 struct CollisionComponent {
-    uint8_t doesDamage : 1 = 0;
-    uint8_t onGround : 1 = 0;
-    uint8_t onCeiling : 1 = 0;
-    uint8_t onLeftWall : 1 = 0;
-    uint8_t onRightWall : 1 = 0;
-    Rect localBoundingBox = {};
-    Rect worldBoundingBox = {}; // Previous location
+    uint8_t isStatic : 1 = false;
+    uint8_t doesDamage : 1 = false;
+    uint8_t onGround : 1 = false;
+    uint8_t onCeiling : 1 = false;
+    uint8_t onLeftWall : 1 = false;
+    uint8_t onRightWall : 1 = false;
+    Rect localBounds = {};
+    Rect worldBounds = {}; // Previous location
 };
 
 }  // namespace ECSEngine
