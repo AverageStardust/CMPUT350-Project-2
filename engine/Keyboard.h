@@ -147,7 +147,7 @@ const unsigned int LaunchApplication1 = 142;
 const unsigned int LaunchApplication2 = 143;
 const unsigned int LaunchMail = 144;
 const unsigned int LaunchMediaSelect = 145;
-const unsigned int ScanCount = 146;
+const unsigned int Count = 146;
 }  // namespace Key
 
 }  // namespace ECSEngine

@@ -52,6 +52,7 @@ set(ECS_SYSTEM_FILES
 )
 
 set(ECS_MANAGER_FILES
+    InputManager.h InputManager.cpp
     SoundManager.h SoundManager.cpp
     SpriteManager.h SpriteManager.cpp
     SystemManager.h
