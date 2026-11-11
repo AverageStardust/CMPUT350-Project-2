@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <limits>
 #include <vector>
 
@@ -42,7 +43,7 @@ public:
         Iterator(Storage<T>& storage, uint32_t index) : mStorage(storage), mIndex(index) {
             // skip past empty slots
             uint32_t size = mStorage.slots.size();
-            while (mStorage.slots[mIndex].generation <= 0 && mIndex < size) mIndex++;
+            while (mIndex < size && mStorage.slots[mIndex].generation <= 0) mIndex++;
         }
 
         reference operator*() const { return mStorage.slots[mIndex].value; }
@@ -57,7 +58,7 @@ public:
 
             // skip past empty slots
             uint32_t size = mStorage.slots.size();
-            while (mStorage.slots[mIndex].generation <= 0 && mIndex < size) mIndex++;
+            while (mIndex < size && mStorage.slots[mIndex].generation <= 0) mIndex++;
 
             return *this;
         }

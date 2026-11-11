@@ -98,7 +98,7 @@ private:
     WindowManager mWindowManager;
     InputManager mInputManager;
 
-    bool debug;
+    bool debug = true;
 };
 
 }  // namespace ECSEngine
