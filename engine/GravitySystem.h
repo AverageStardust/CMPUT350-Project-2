@@ -17,8 +17,6 @@ public:
     }
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
-        (void)engine;
-
         EntityManager<Components...>& em = engine->GetEntityManager();
 
         for (Entity entity : em) {
