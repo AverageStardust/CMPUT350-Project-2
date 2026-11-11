@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MathUtil.h"
 #include "SpriteManager.h"
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -11,6 +12,7 @@ namespace ECSEngine {
 class SpriteComponent {
 public:
     SpriteID spriteID;
+    Point2D offset = {};
     bool worldSpace;  // If false, this sprite is drawn in screen space instead of world space
 private:
 };

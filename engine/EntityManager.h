@@ -17,6 +17,8 @@ public:
 
     Entity<Components...>& GetEntity(EntityID entity) { return mEntities.Get(entity); }
 
+    Entity<Components...> const& GetEntity(EntityID entity) const { return mEntities.Get(entity); }
+
     void RemoveEntity(EntityID entity) {
         (RemoveComponent<Components>(entity), ...);
         mEntities.Remove(entity);
@@ -49,13 +51,13 @@ public:
     }
 
     template <typename T>
-    bool HasComponent(Entity<Components...>& entity) const {
+    bool HasComponent(Entity<Components...> const& entity) const {
         return entity.template GetComponetID<T>() != NullComponent;
     }
 
     template <typename T>
     bool HasComponent(EntityID entity) const {
-        return HasComponent(GetEntity(entity));
+        return HasComponent<T>(GetEntity(entity));
     }
 
     template <typename T>

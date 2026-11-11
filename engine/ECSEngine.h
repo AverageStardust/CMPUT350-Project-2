@@ -68,7 +68,7 @@ public:
 
     SystemManager<Components...>& GetSystemManager() { return mSystemManager; }
 
-    InputManager& GetInputManager() { return mInputManager; }
+    InputManager& GetInputManager() override { return mInputManager; }
 
 private:
     bool ProcessEvents() { return true; };

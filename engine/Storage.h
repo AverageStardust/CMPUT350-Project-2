@@ -4,14 +4,12 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
-#include <limits>
 #include <vector>
 
 namespace ECSEngine {
 
 using Ticket = uint64_t;
-static constexpr int64_t NullTicket = std::numeric_limits<uint64_t>::max();
+static constexpr int64_t NullTicket = 0;
 
 // generic iterable slot map
 // uses 32-bits per ticket as an index, and the remaining 32-bits as a generation number
@@ -94,14 +92,7 @@ public:
         freeSlots.push_back(splitTicket.index);
     }
 
-    T& Get(Ticket ticket) {
-        SplitTicket splitTicket = cutTicket(ticket);
-        assert(isValid(splitTicket));
-
-        return slots[splitTicket.index].value;
-    }
-
-    bool Get(Ticket ticket, T& result) {
+    bool Get(Ticket ticket, const T& result) const {
         SplitTicket splitTicket = cutTicket(ticket);
         if (isValid(splitTicket)) {
             result = slots[splitTicket.index].value;
@@ -111,10 +102,24 @@ public:
         return false;
     }
 
-    const T& Get(Ticket ticket) const { return Get(ticket); }
-    bool Get(Ticket ticket, const T& result) const { return Get(ticket, result); }
-    T& operator[](Ticket ticket) { return Get(ticket); };
+    const T& Get(Ticket ticket) const {
+        SplitTicket splitTicket = cutTicket(ticket);
+        assert(isValid(splitTicket));
+
+        return slots[splitTicket.index].value;
+    }
+
     const T& operator[](Ticket ticket) const { return Get(ticket); };
+
+    T& Get(Ticket ticket) {
+        return const_cast<T&>(const_cast<const Storage<T>*>(this)->Get(ticket));
+    }
+
+    bool Get(Ticket ticket, T& result) {
+        return const_cast<const Storage<T>*>(this)->Get(ticket, const_cast<T&>(result));
+    }
+
+    T& operator[](Ticket ticket) { return Get(ticket); };
 
     bool IsValid(Ticket ticket) const { return isValid(cutTicket(ticket)); }
 
@@ -150,18 +155,18 @@ private:
     }
 
     bool isValid(SplitTicket splitTicket) const {
-        return (splitTicket.index < slots.size()) &&
+        return splitTicket.generation > 0 && (splitTicket.index < slots.size()) &&
                slots[splitTicket.index].generation == splitTicket.generation;
     }
 
-    SplitTicket cutTicket(Ticket ticket) {
+    SplitTicket cutTicket(Ticket ticket) const {
         return SplitTicket{
             .index = (uint32_t)(ticket),
             .generation = (int32_t)(ticket >> 32),
         };
     }
 
-    Ticket joinTicket(SplitTicket splitTicket) {
+    Ticket joinTicket(SplitTicket splitTicket) const {
         return (uint64_t)splitTicket.index + (((uint64_t)splitTicket.generation) << 32);
     }
 };

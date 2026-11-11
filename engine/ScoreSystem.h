@@ -1,10 +1,14 @@
 #pragma once
 
+#include <cmath>
 #include <string>
 
-#include "SystemManager.h"
+#include "Entity.h"
 #include "EntityManager.h"
+#include "MathUtil.h"
 #include "ScoreComponent.h"
+#include "SpriteComponent.h"
+#include "SystemManager.h"
 
 namespace ECSEngine {
 
@@ -19,23 +23,33 @@ public:
     tSystemReturn Run(EngineView<Components...>* engine) override {
         EntityManager<Components...>& em = engine->GetEntityManager();
 
-        for (Entity entity : em) {
-            if (entity.template HasComponent<ScoreComponent>()) {
+        Storage<std::pair<EntityID, ScoreComponent>>& scoreStore =
+            em.template GetComponentStorage<ScoreComponent>();
 
-                ScoreComponent& scoreComp = em.template GetComponent<ScoreComponent>(entity);
+        for (std::pair<EntityID, ScoreComponent> pair : scoreStore) {
+            ScoreComponent& scoreComp = pair.second;
 
-                int divAmount = 1;
-                for (EntityID eID : scoreComp.digitID) {
-                    int digitValue = (scoreComp.score / divAmount) % 10;
-                    Entity curEntity = em.GetEntity(eID);
-
-                    if (curEntity.template HasComponent<SpriteComponent>()) {
-                        SpriteComponent& curSpriteComp = em.template GetComponent<SpriteComponent>(curEntity);
-                        curSpriteComp.spriteID = scoreComp.digitTextureID[digitValue];
-                    }
-
-                    divAmount *= 10;
+            int digitCount = sizeof(scoreComp.digitID) / sizeof(scoreComp.digitID[0]);
+            for (int i = 0; i < digitCount; i++) {
+                if (scoreComp.digitID[i] == NullEntity) {
+                    scoreComp.digitID[i] = em.CreateEntity();
                 }
+
+                EntityID& digitID = scoreComp.digitID[i];
+
+                int placeValue = int(std::pow(10, sizeof(scoreComp.digitID) - i - 1));
+                int digitValue = (scoreComp.score / placeValue) % 10;
+
+                if (!em.template HasComponent<SpriteComponent>(digitID)) {
+                    em.AddComponent(digitID, SpriteComponent{
+                                                 .spriteID = scoreComp.digitSpriteID[0],
+                                                 .worldSpace = false,
+                                             });
+                }
+
+                SpriteComponent& spriteComp = em.template GetComponent<SpriteComponent>(digitID);
+                spriteComp.offset = scoreComp.offset + Point2D{i * scoreComp.spacing, 0};
+                spriteComp.spriteID = scoreComp.digitSpriteID[digitValue];
             }
         }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Entity.h"
 #include "EntityManager.h"
 #include "LocationComponent.h"
 #include "MathUtil.h"
@@ -26,19 +27,23 @@ public:
 
         EntityManager<Components...>& em = engine->GetEntityManager();
 
-        for (Entity entity : em) {
-            if (entity.template HasComponent<LocationComponent>() &&
-                entity.template HasComponent<SpriteComponent>()) {
-                LocationComponent& locationComp =
-                    em.template GetComponent<LocationComponent>(entity);
-                SpriteComponent& spriteComp = em.template GetComponent<SpriteComponent>(entity);
+        Storage<std::pair<EntityID, SpriteComponent>>& spriteStore =
+            em.template GetComponentStorage<SpriteComponent>();
 
-                sf::Sprite sprite = sm.GetSprite(spriteComp.spriteID);
-                if (spriteComp.worldSpace) {
-                    wm.DrawSpriteWorld(sprite, locationComp.loc);
-                } else {
-                    wm.DrawSpriteWindow(sprite, locationComp.loc);
-                }
+        for (std::pair<EntityID, SpriteComponent> pair : spriteStore) {
+            EntityID entityID = pair.first;
+            SpriteComponent& spriteComp = pair.second;
+
+            Point2D location = {};
+            if (em.template HasComponent<LocationComponent>(entityID)) {
+                location = em.template GetComponent<LocationComponent>(entityID).loc;
+            }
+
+            sf::Sprite sprite = sm.GetSprite(spriteComp.spriteID);
+            if (spriteComp.worldSpace) {
+                wm.DrawSpriteWorld(sprite, location + spriteComp.offset);
+            } else {
+                wm.DrawSpriteWindow(sprite, location + spriteComp.offset);
             }
         }
 

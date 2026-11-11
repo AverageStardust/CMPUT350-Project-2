@@ -28,7 +28,7 @@ public:
                 for (auto innerIt = std::next(outerIt); innerIt != em.end(); ++innerIt) {
                     Entity innerEntity = *innerIt;
 
-                    if (outerEntity.template HasComponent<CollisionComponent>()) {
+                    if (innerEntity.template HasComponent<CollisionComponent>()) {
                         CollisionComponent& innerCollisionComp = em.template GetComponent<CollisionComponent>(innerEntity);
 
                         if (outerCollisionComp.worldBoundingBox.IsOverlapping(innerCollisionComp.worldBoundingBox)) {

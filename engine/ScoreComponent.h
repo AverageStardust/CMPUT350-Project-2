@@ -1,7 +1,6 @@
 #pragma once
 
-#include <unordered_map>
-
+#include "Entity.h"
 #include "MathUtil.h"
 #include "SpriteManager.h"
 
@@ -12,8 +11,10 @@ namespace ECSEngine {
 class ScoreComponent {
 public:
     int score;
-    SpriteID digitTextureID[10];
-    EntityID digitID[3];
+    Point2D offset = {8, 8};
+    float spacing = 38;
+    SpriteID digitSpriteID[10];
+    EntityID digitID[3] = {NullEntity, NullEntity, NullEntity};
 
 private:
 };

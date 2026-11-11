@@ -11,7 +11,8 @@
 namespace ECSEngine {
 
 using EntityID = Ticket;
-static constexpr size_t NullComponent = std::numeric_limits<Ticket>::max();
+static constexpr size_t NullComponent = NullTicket;
+static constexpr size_t NullEntity = NullTicket;
 
 template <typename T>
 struct ComponentSlot {

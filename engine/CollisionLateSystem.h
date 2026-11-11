@@ -6,7 +6,6 @@
 #include "EntityManager.h"
 #include "CollisionComponent.h"
 #include "LocationComponent.h"
-#include "SpriteComponent.h"
 
 namespace ECSEngine {
 
