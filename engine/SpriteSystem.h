@@ -29,10 +29,17 @@ public:
         for (Entity entity : em) {
             if (entity.template HasComponent<LocationComponent>() &&
                 entity.template HasComponent<SpriteComponent>()) {
-                LocationComponent& locationComp = em.template GetComponent<LocationComponent>(entity);
+                LocationComponent& locationComp =
+                    em.template GetComponent<LocationComponent>(entity);
                 SpriteComponent& spriteComp = em.template GetComponent<SpriteComponent>(entity);
 
-                wm.DrawSpriteWorld(sm.GetSprite(spriteComp.spriteID), spriteComp.bounds + locationComp.loc);
+                if (spriteComp.worldSpace) {
+                    wm.DrawSpriteWorld(sm.GetSprite(spriteComp.spriteID),
+                                       spriteComp.bounds + locationComp.loc);
+                } else {
+                    wm.DrawSpriteWindow(sm.GetSprite(spriteComp.spriteID),
+                                        spriteComp.bounds + locationComp.loc);
+                }
             }
         }
 
