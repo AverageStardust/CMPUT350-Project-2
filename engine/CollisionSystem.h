@@ -3,6 +3,8 @@
 #include <string>
 
 #include "SystemManager.h"
+#include "EntityManager.h"
+#include "CollisionComponent.h"
 
 namespace ECSEngine {
 
@@ -15,7 +17,28 @@ public:
     }
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
-        (void)engine;
+        EntityManager<Components...>& em = engine->GetEntityManager();
+
+        for (auto outerIt = em.begin(); outerIt != em.end(); ++outerIt) {
+            Entity outerEntity = *outerIt;
+
+            if (outerEntity.template HasComponent<CollisionComponent>()) {
+                CollisionComponent& outerCollisionComp = em.template GetComponent<CollisionComponent>(outerEntity);
+
+                for (auto innerIt = std::next(outerIt); innerIt != em.end(); ++innerIt) {
+                    Entity innerEntity = *innerIt;
+
+                    if (outerEntity.template HasComponent<CollisionComponent>()) {
+                        CollisionComponent& innerCollisionComp = em.template GetComponent<CollisionComponent>(innerEntity);
+
+                        if (outerCollisionComp.worldBoundingBox.IsOverlapping(innerCollisionComp.worldBoundingBox)) {
+                            // TODO: tell entities they're colliding
+                        }
+                    }
+                }
+            }
+        }
+
         return kContinue;
     }
 };

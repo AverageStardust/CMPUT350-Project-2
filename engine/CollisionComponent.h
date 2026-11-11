@@ -16,7 +16,7 @@ struct CollisionComponent {
     uint8_t onLeftWall : 1 = 0;
     uint8_t onRightWall : 1 = 0;
     Rect localBoundingBox = {};
-    Rect worldBoudingBox = {};
+    Rect worldBoundingBox = {}; // Previous location
 };
 
 }  // namespace ECSEngine
