@@ -26,7 +26,7 @@ public:
 
     template <typename T>
     void AddComponent(Entity<Components...>& entity, T component) {
-        Ticket componentID = GetComponentStorage<T>().Store(component);
+        Ticket componentID = GetComponentStorage<T>().Store({entity.GetID(), component});
         entity.template GetComponetID<T>() = componentID;
     }
 
@@ -61,7 +61,7 @@ public:
     template <typename T>
     T& GetComponent(Entity<Components...>& entity) {
         Ticket componentID = entity.template GetComponetID<T>();
-        return GetComponentStorage<T>().Get(componentID);
+        return GetComponentStorage<T>().Get(componentID).second;
     }
 
     template <typename T>
@@ -70,8 +70,8 @@ public:
     }
 
     template <typename T>
-    Storage<T>& GetComponentStorage() {
-        return std::get<Storage<T>>(mComponents);
+    Storage<std::pair<EntityID, T>>& GetComponentStorage() {
+        return std::get<Storage<std::pair<EntityID, T>>>(mComponents);
     }
 
     Storage<Entity<Components...>>::Iterator cbegin() const { return mEntities.begin(); }
@@ -81,7 +81,7 @@ public:
 
 private:
     Storage<Entity<Components...>> mEntities;
-    std::tuple<Storage<Components>...> mComponents;
+    std::tuple<Storage<std::pair<EntityID, Components>>...> mComponents;
 };
 
 }  // namespace ECSEngine

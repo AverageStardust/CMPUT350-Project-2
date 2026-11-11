@@ -2,6 +2,9 @@
 
 #include <string>
 
+#include "EntityManager.h"
+#include "InputComponent.h"
+#include "InputManager.h"
 #include "Keyboard.h"
 #include "SystemManager.h"
 
@@ -23,7 +26,15 @@ public:
     }
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
-        (void)engine;
+        InputManager& im = engine->GetInputManager();
+        EntityManager<Components...>& em = engine->GetEntityManager();
+        Storage<std::pair<EntityID, InputComponent>>& inputStorage =
+            em.template GetComponentStorage<InputComponent>();
+        for (std::pair<EntityID, InputComponent> pair : inputStorage) {
+            (void)im;
+            (void)pair;  // TODO: handle input
+        }
+
         return kContinue;
     }
 };
