@@ -10,11 +10,8 @@
 namespace ECSEngine {
 
 struct InputComponent {
-    InputComponent(EntityID whichEntity) : entity(whichEntity), lastDash(0) {}
-    EntityID entity;
-    int lastDash;
-    std::bitset<sf::Keyboard::ScancodeCount> keydown;
-    std::bitset<sf::Keyboard::ScancodeCount> lastKeydown;
+    InputComponent() : dashesLeft(0) {}
+    int dashesLeft;
 };
 
 }  // namespace ECSEngine

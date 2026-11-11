@@ -8,28 +8,26 @@
 
 namespace ECSEngine {
 
-InputManager::InputManager() {
-    mKeyState.resize(Key::Count);
-    mLastKeyState.resize(Key::Count);
-}
-
 bool InputManager::KeyIsDown(unsigned int keycode) {
-    if (keycode >= mKeyState.size()) return false;
-    return mKeyState[keycode];
+    if (keycode >= mKeyDown.size()) return false;
+    return mKeyDown[keycode];
 }
 bool InputManager::KeyJustPressed(unsigned int keycode) {
-    if (keycode >= mKeyState.size()) return false;
-    return mKeyState[keycode] && !mLastKeyState[keycode];
+    if (keycode >= mKeyDown.size()) return false;
+    return mKeyDown[keycode] && !mLastKeyDown[keycode];
 }
 bool InputManager::KeyJustReleased(unsigned int keycode) {
-    if (keycode >= mKeyState.size()) return false;
-    return mLastKeyState[keycode] && !mKeyState[keycode];
+    if (keycode >= mKeyDown.size()) return false;
+    return mLastKeyDown[keycode] && !mKeyDown[keycode];
 }
 Point2D InputManager::GetMousePosition() { return mMousePosition; }
 
 void InputManager::update(std::shared_ptr<sf::RenderWindow> window) {
     // check for events
-    copy(mKeyState.begin(), mKeyState.end(), back_inserter(mLastKeyState));
+
+    for (size_t i = 0; i < mKeyDown.size(); i++) {
+        mLastKeyDown[i] = mKeyDown[i];
+    }
 
     while (const std::optional event = window->pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
@@ -38,9 +36,9 @@ void InputManager::update(std::shared_ptr<sf::RenderWindow> window) {
             sf::Vector2i pos = event->getIf<sf::Event::MouseMoved>()->position;
             mMousePosition = {(float)pos.x, (float)pos.y};
         } else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-            mKeyState[int(keyPressed->scancode)] = true;
+            mKeyDown[int(keyPressed->scancode)] = true;
         } else if (const auto* keyPressed = event->getIf<sf::Event::KeyReleased>()) {
-            mKeyState[int(keyPressed->scancode)] = false;
+            mKeyDown[int(keyPressed->scancode)] = false;
         }
     }
 }

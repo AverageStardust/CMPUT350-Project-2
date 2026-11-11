@@ -1,14 +1,17 @@
 #pragma once
 
+#include <bitset>
 #include <memory>
-#include <vector>
+
+#include "InputSystem.h"
 #include "MathUtil.h"
 #include "SFML/Graphics/RenderWindow.hpp"
+
 namespace ECSEngine {
 
 class InputManager {
 public:
-    InputManager();
+    InputManager() = default;
     ~InputManager() = default;
 
     bool KeyIsDown(unsigned int keycode);
@@ -20,9 +23,9 @@ private:
     template <typename... Any>
     friend class ECSEngine;
 
-    std::vector<bool> mKeyState = {};
-    std::vector<bool> mLastKeyState = {};
-    Point2D mMousePosition = {};
+    std::bitset<Key::Count> mKeyDown;
+    std::bitset<Key::Count> mLastKeyDown;
+    Point2D mMousePosition;
 
     void update(std::shared_ptr<sf::RenderWindow> window);
 };
