@@ -73,8 +73,6 @@ public:
 private:
     bool ProcessEvents() { return true; };
     void DebugDraw() {
-        mWindowManager.SetWorldCenter(mInputManager.GetMousePosition() + 200);
-
         // draw entities (temperary for testings)
         for (Entity entity : mEntityManager) {
             if (entity.template HasComponent<LocationComponent>() &&

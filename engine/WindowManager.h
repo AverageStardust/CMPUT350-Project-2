@@ -27,6 +27,9 @@ public:
     Point2D WorldToWindow(const Point2D& pt) const;
     Point2D WindowToWorld(const Point2D& pt) const;
 
+    void DrawSpriteWorld(sf::Sprite& sprite, Rect bounds);
+    void DrawSpriteWindow(sf::Sprite& sprite, Rect bounds);
+
     void DebugDrawRect(const Rect& rect, int red, int green, int blue, int alpha = 255);
     void DebugFrameRect(const Rect& rect, int red, int green, int blue, int alpha = 255);
 

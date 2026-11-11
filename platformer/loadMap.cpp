@@ -121,7 +121,7 @@ void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position) {
     entityManager.AddComponent(entity, ECSEngine::LocationComponent{position});
 
     entityManager.AddComponent(entity, ECSEngine::SpriteComponent{
-                                           .textureID = type.spriteID,
+                                           .spriteID = type.spriteID,
                                            .bounds = type.spriteBounds,
                                            .worldSpace = true,
                                        });

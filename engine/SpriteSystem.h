@@ -1,13 +1,12 @@
 #pragma once
 
-#include <bitset>
-#include <unordered_map>
-
-#include "CameraComponent.h"
 #include "EntityManager.h"
+#include "LocationComponent.h"
 #include "MathUtil.h"
+#include "SpriteComponent.h"
 #include "SpriteManager.h"
 #include "SystemManager.h"
+#include "WindowManager.h"
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
@@ -22,7 +21,21 @@ public:
     }
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
-        (void)engine;
+        WindowManager& wm = engine->GetWindowManager();
+        SpriteManager& sm = engine->GetSpriteManager();
+
+        EntityManager<Components...>& em = engine->GetEntityManager();
+
+        for (Entity entity : em) {
+            if (entity.template HasComponent<LocationComponent>() &&
+                entity.template HasComponent<SpriteComponent>()) {
+                LocationComponent& locationComp = em.template GetComponent<LocationComponent>(entity);
+                SpriteComponent& spriteComp = em.template GetComponent<SpriteComponent>(entity);
+
+                wm.DrawSpriteWorld(sm.GetSprite(spriteComp.spriteID), spriteComp.bounds + locationComp.loc);
+            }
+        }
+
         return kContinue;
     }
 };

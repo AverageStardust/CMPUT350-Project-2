@@ -15,6 +15,8 @@ struct Point2D {
     float x, y;
 
     Point2D(float x = 0, float y = 0) : x(x), y(y) {}
+    Point2D(sf::Vector2f vec): x(vec.x), y(vec.y) {}
+    Point2D(sf::Vector2i vec): x(vec.x), y(vec.y) {}
 
     Point2D operator+(const Point2D& other) const;
     Point2D operator+(const float& scalar) const;
@@ -41,6 +43,7 @@ struct Point2D {
     Point2D Abs() const;
     Point2D Sign() const;
     Point2D PairwiseMult(Point2D other) const;
+    Point2D PairwiseDiv(Point2D other) const;
     float Dot(Point2D other) const;
     float Cross(Point2D other) const;
     float Distance(const Point2D& other) const;
@@ -54,12 +57,10 @@ struct Point2D {
     float Length() const;
     float LengthSq() const;
     static Point2D PairwiseMult(Point2D a, Point2D b);
+    static Point2D PairwiseDiv(Point2D a, Point2D b);
     static float Dot(Point2D a, Point2D b);
     static float Cross(Point2D a, Point2D b);
 
-private:
-    friend class WindowManager;
-    friend struct Rect;
     sf::Vector2f AsSfmlVectorF() const;
     sf::Vector2i AsSfmlVectorI() const;
 };
@@ -103,7 +104,7 @@ struct Rect {
     Point2D topLeft;
     Point2D bottomRight;
 
-    Rect() : topLeft({0, 0}), bottomRight({-1, -1}) {}
+    Rect() : topLeft(Point2D{0, 0}), bottomRight(Point2D{-1, -1}) {}
     Rect(float left, float top, float width = 0, float height = 0)
         : topLeft(Point2D(left, top)), bottomRight(Point2D(left + width, top + height)) {}
     Rect(Point2D tl, int w = 0, int h = 0) : topLeft(tl), bottomRight(tl + Point2D(w, h)) {}
@@ -148,8 +149,6 @@ struct Rect {
     bool Intersects(const Rect& other, Point2D& point) const;
     bool Intersects(const Quad& other, Point2D& point) const;
 
-private:
-    friend class SpriteManager;
     sf::FloatRect AsSfmlRectF() const;
     sf::IntRect AsSfmlRectI() const;
 };

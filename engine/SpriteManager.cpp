@@ -2,24 +2,25 @@
 
 namespace ECSEngine {
 
-Ticket SpriteManager::RegisterSprite(const std::string& texturePath, const Rect& sourceRect) {
-    sf::Texture texture;
+SpriteID SpriteManager::RegisterSprite(const std::string& texturePath, const Rect& sourceRect) {
+    sf::Texture* texture;
 
     if (managedTextures.contains(texturePath)) {
         // already cached, use it again
-        texture = managedTextures[texturePath];
+        texture = &managedTextures[texturePath];
     } else {
         // load this new texture
-        if (!texture.loadFromFile(texturePath, false)) {
+        managedTextures[texturePath] = {};
+        texture = &managedTextures[texturePath];
+
+        if (!texture->loadFromFile(texturePath, false)) {
             throw std::runtime_error("Could not load texture");
         }
-
-        managedTextures[texturePath] = texture;
     }
 
-    return managedSprites.Store(sf::Sprite(texture, sourceRect.AsSfmlRectI()));
+    return managedSprites.Store(sf::Sprite(*texture, sourceRect.AsSfmlRectI()));
 }
 
-sf::Sprite& SpriteManager::GetSprite(Ticket id) { return managedSprites.Get(id); }
+sf::Sprite& SpriteManager::GetSprite(SpriteID id) { return managedSprites.Get(id); }
 
 }  // namespace ECSEngine

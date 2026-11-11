@@ -3,6 +3,7 @@
 #include "MathUtil.h"
 #include "SFML/Graphics/Color.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
+#include "SFML/Graphics/Sprite.hpp"
 #include "SFML/System/Vector2.hpp"
 
 namespace ECSEngine {
@@ -42,6 +43,19 @@ void WindowManager::DebugFrameRect(const Rect& rect, int red, int green, int blu
     sfRect.setOutlineThickness(std::max(1.0f, 1.0f / mWorldUnitsPerPixel));
 
     mWindow->draw(sfRect);
+}
+
+void WindowManager::DrawSpriteWorld(sf::Sprite& sprite, Rect bounds) {
+    DrawSpriteWindow(sprite, bounds);
+}
+
+void WindowManager::DrawSpriteWindow(sf::Sprite& sprite, Rect bounds) {
+    sprite.setPosition(bounds.topLeft.AsSfmlVectorF());
+
+    Point2D textureSize = sprite.getTextureRect().size;
+    sprite.setScale(bounds.Size().PairwiseDiv(textureSize).AsSfmlVectorF());
+
+    mWindow->draw(sprite);
 }
 
 Rect WindowManager::WindowToWorld(const Rect& rect) const {

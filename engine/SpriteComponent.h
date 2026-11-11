@@ -14,7 +14,7 @@ namespace ECSEngine {
 // This is only defined if an entity also has a LocationComponent.
 class SpriteComponent {
 public:
-    SpriteID textureID;
+    SpriteID spriteID;
     Rect bounds;
     bool worldSpace;  // If false, this sprite is drawn in screen space instead of world space
 private:
