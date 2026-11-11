@@ -10,7 +10,6 @@
 namespace ECSEngine {
 
 struct CollisionComponent {
-    uint8_t staticEntity : 1 = 0;
     uint8_t doesDamage : 1 = 0;
     uint8_t onGround : 1 = 0;
     uint8_t onCeiling : 1 = 0;
