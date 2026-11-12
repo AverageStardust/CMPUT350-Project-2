@@ -42,10 +42,10 @@ public:
                         em.AddComponent(spawnedID, LocationComponent{ .loc = locationComp.loc });
 
                         em.AddComponent(spawnedID, SpriteComponent{ .spriteID = spawnComp.spawnTextureID,
+                                                                    .offset = Point2D(0, 0),
                                                                     .worldSpace = true });
-                        // Not sure how to initialize spriteComp bounds here, probably will rely on entity type
 
-                        // TODO: handle spawnType-specific code
+                        // TODO: specialize this code for star entities
 
                     }
                 }
