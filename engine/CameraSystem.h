@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "EntityManager.h"
 #include "LocationComponent.h"
+#include "MathUtil.h"
 #include "SystemManager.h"
 #include "WindowManager.h"
 #include <SFML/Graphics/Sprite.hpp>
@@ -38,15 +39,31 @@ public:
                     Point2D windowPosition = wm.WorldToWindow(targetLocation.loc);
 
                     if (!follower.hardExclusion.IsInside(windowPosition)) {
-                        Point2D screenDistance = windowPosition - follower.hardExclusion.NearestInside(windowPosition);
+                        Point2D screenDistance =
+                            windowPosition - follower.hardExclusion.NearestInside(windowPosition);
                         camera.position += wm.WindowDistanceToWorld(screenDistance);
                     } else if (!follower.softExclusion.IsInside(windowPosition)) {
-                        camera.position = camera.position.MoveTowards(targetLocation.loc, follower.speed / FRAME_RATE);
+                        camera.position = camera.position.MoveTowards(targetLocation.loc,
+                                                                      follower.speed / FRAME_RATE);
                     }
                 }
             }
 
-            wm.SetWorldCenter({camera.position.x, 384});
+            Point2D cameraPosition = {camera.position.x, 384};
+
+            if (entity.template HasComponent<CameraShake>()) {
+                CameraShake& shake = em.template GetComponent<CameraShake>(entity);
+                if (shake.frameTime > 0) {
+                    shake.frameTime--;
+                    shake.offset = shake.offset.Lerp({float(rand() % 32 - 16), float(rand() % 32 - 16)}, 0.1);
+                } else {
+                    shake.offset = shake.offset.Lerp({0, 0}, 0.1);
+                }
+
+                cameraPosition += shake.offset;
+            }
+
+            wm.SetWorldCenter(cameraPosition);
             wm.SetWorldScale(camera.worldUnitsPerPixel);
 
             break;  // found camera, done
