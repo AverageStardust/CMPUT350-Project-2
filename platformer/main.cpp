@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     ECSEngine::Point2D playerStartPos = ECSEngine::Point2D(128, 128);
     em.AddComponent(player, ECSEngine::LocationComponent{.loc = playerStartPos});
     em.AddComponent(player, ECSEngine::MovementComponent{.velocity = ECSEngine::Point2D(0, 0)});
-    em.AddComponent(player, ECSEngine::GravityComponent(ECSEngine::Point2D(25, 100), 0));
+    em.AddComponent(player, ECSEngine::GravityComponent(ECSEngine::Point2D(50, 100), 0));
     em.AddComponent(player, ECSEngine::RespawnComponent{.loc = playerStartPos});
 
     em.AddComponent(player, ECSEngine::InputComponent());
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
     em.AddComponent(camera, ECSEngine::CameraFollower{.targetID = player,
                                                       .hardExclusion = {256, 0, 512, 768},
                                                       .softExclusion = {448, 0, 128, 768},
-                                                      .speed = 96});
+                                                      .speed = 128});
     em.AddComponent(camera, ECSEngine::CameraShake{});
 
     // Add all systems

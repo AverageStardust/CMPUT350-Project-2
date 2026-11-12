@@ -125,6 +125,7 @@ void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position) {
     if (type.collisionBounds.Exists()) {
         entityManager.AddComponent(
             entity, ECSEngine::CollisionComponent{.isStatic = true,
+                                                  .doesDamage = type.symbol == 'x',
                                                   .localBounds = type.collisionBounds});
     }
 }
