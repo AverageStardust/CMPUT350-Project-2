@@ -6,6 +6,8 @@
 
 namespace ECSEngine {
 
+const unsigned int FRAME_RATE = 60;
+
 class WindowManager {
 public:
     WindowManager(unsigned int width, unsigned int height, const std::string& title);

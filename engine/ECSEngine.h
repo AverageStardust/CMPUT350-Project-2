@@ -6,6 +6,7 @@
 #include "EntityManager.h"
 #include "InputManager.h"
 #include "LocationComponent.h"
+#include "MathUtil.h"
 #include "SoundManager.h"
 #include "SpriteManager.h"
 #include "SystemManager.h"
@@ -85,6 +86,7 @@ private:
                 Rect rect = collision.localBounds + location.loc;
 
                 mWindowManager.DebugFrameRect(rect, 255, 0, 0, 255);
+                mWindowManager.DebugFrameRect(Rect{location.loc - 2, location.loc + 2}, 0, 255, 0, 255);
             }
         }
     };

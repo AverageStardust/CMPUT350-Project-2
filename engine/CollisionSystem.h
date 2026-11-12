@@ -30,25 +30,31 @@ public:
     void resolveCollision(EntityManager<Components...>& em, CollisionComponent& otherComp,
                           CollisionComponent& entityComp, Entity<Components...>& entity) {
         LocationComponent locationComp;
-        if (entity.template HasComponent<LocationComponent>()) {
+        if (entity.template HasComponent<LocationComponent>() &&
+            entity.template HasComponent<MovementComponent>()) {
             Rect overlap = otherComp.worldBounds & entityComp.worldBounds;
 
             if (overlap.Area() > 1) {
                 LocationComponent& location = em.template GetComponent<LocationComponent>(entity);
+                MovementComponent& movement = em.template GetComponent<MovementComponent>(entity);
                 if (overlap.Width() < overlap.Height()) {
                     if (entityComp.worldBounds.Center().x > otherComp.worldBounds.Center().x) {
                         location.loc.x += overlap.Width();
+                        movement.velocity.x = std::max(movement.velocity.x, 0.0f);
                         entityComp.onLeftWall = true;
                     } else {
                         location.loc.x -= overlap.Width();
+                        movement.velocity.x = std::min(movement.velocity.x, 0.0f);
                         entityComp.onRightWall = true;
                     }
                 } else {
                     if (entityComp.worldBounds.Center().y > otherComp.worldBounds.Center().y) {
                         location.loc.y += overlap.Height();
+                        movement.velocity.y = std::max(movement.velocity.y, 0.0f);
                         entityComp.onGround = true;
                     } else {
                         location.loc.y -= overlap.Height();
+                        movement.velocity.y = std::min(movement.velocity.y, 0.0f);
                         entityComp.onCeiling = true;
                     }
                 }
@@ -74,6 +80,7 @@ public:
                 Entity<Components...>& dynamicEntity = em.GetEntity(dynamicPair.first);
 
                 for (auto otherPair : collisionStore) {
+                    if (dynamicPair.first == otherPair.first) continue;
                     // Entity<Components...>& otherEntity = em.GetEntity(otherPair.first);
                     CollisionComponent& otherComp = otherPair.second;
 

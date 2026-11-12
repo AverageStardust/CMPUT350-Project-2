@@ -5,6 +5,7 @@
 #include "SystemManager.h"
 #include "EntityManager.h"
 #include "LocationComponent.h"
+#include "WindowManager.h"
 
 namespace ECSEngine {
 
@@ -21,11 +22,11 @@ public:
         for (Entity entity : em) {
             if (entity.template HasComponent<LocationComponent>() &&
                 entity.template HasComponent<MovementComponent>()) {
-                
+
                 LocationComponent& locationComp = em.template GetComponent<LocationComponent>(entity);
                 MovementComponent& movementComp = em.template GetComponent<MovementComponent>(entity);
 
-                locationComp.loc += movementComp.velocity;
+                locationComp.loc += movementComp.velocity / FRAME_RATE;
             }
         }
 

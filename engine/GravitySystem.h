@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "EntityManager.h"
+#include "WindowManager.h"
 #include "SystemManager.h"
 #include "LocationComponent.h"
 #include "CollisionComponent.h"
@@ -23,13 +25,13 @@ public:
             if (entity.template HasComponent<GravityComponent>() &&
                 entity.template HasComponent<MovementComponent>() &&
                 entity.template HasComponent<CollisionComponent>()) {
-                
+
                 GravityComponent& gravityComp = em.template GetComponent<GravityComponent>(entity);
                 MovementComponent& movementComp = em.template GetComponent<MovementComponent>(entity);
                 CollisionComponent& collisionComp = em.template GetComponent<CollisionComponent>(entity);
 
                 if (!collisionComp.onGround) {
-                    movementComp.velocity += gravityComp.acceleration;
+                    movementComp.velocity += gravityComp.acceleration / FRAME_RATE;
                 }
             }
         }
