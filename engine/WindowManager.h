@@ -28,6 +28,8 @@ public:
     Rect WorldToWindow(const Rect& rect) const;
     Point2D WorldToWindow(const Point2D& pt) const;
     Point2D WindowToWorld(const Point2D& pt) const;
+    Point2D WorldDistanceToWindow(const Point2D& pt) const;
+    Point2D WindowDistanceToWorld(const Point2D& pt) const;
 
     void DrawSpriteWorld(sf::Sprite& sprite, Point2D position);
     void DrawSpriteWindow(sf::Sprite& sprite, Point2D position);

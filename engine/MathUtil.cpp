@@ -58,7 +58,21 @@ Point2D Point2D::Max(Point2D other) const {
     return Point2D(std::max(x, other.x), std::max(y, other.y));
 }
 Point2D Point2D::Abs() const { return Point2D(std::abs(x), std::abs(y)); }
+Point2D Point2D::Round() const { return Point2D(std::round(x), std::round(y)); }
 Point2D Point2D::Sign() const { return Point2D((x > 0) ? 1 : -1, (y > 0) ? 1 : -1); }
+Point2D Point2D::Lerp(Point2D other, float fraction) const {
+    return *this + (other - *this) * fraction;
+}
+Point2D Point2D::MoveTowards(Point2D other, float distance) const {
+    Point2D diff = other - *this;
+    float diffLength = diff.Length();
+
+    if (diffLength < distance) {
+        return other;
+    } else {
+        return *this + diff * (distance / diffLength);
+    }
+}
 Point2D Point2D::PairwiseMult(Point2D other) const { return {x * other.x, y * other.y}; }
 Point2D Point2D::PairwiseDiv(Point2D other) const { return {x / other.x, y / other.y}; }
 float Point2D::Dot(Point2D other) const { return x * other.x + y * other.y; }
@@ -357,6 +371,21 @@ Rect Rect::Inseted(int inset) const {
 }
 bool Rect::IsInside(const Point2D& p) const {
     return p.x >= topLeft.x && p.x <= bottomRight.x && p.y >= topLeft.y && p.y <= bottomRight.y;
+}
+Point2D Rect::NearestInside(const Point2D& p) const {
+    Point2D nearest = p;
+
+    if (nearest.x < topLeft.x)
+        nearest.x = topLeft.x;
+    else if (nearest.x > bottomRight.x)
+        nearest.x = bottomRight.x;
+
+    if (nearest.y < topLeft.y)
+        nearest.y = topLeft.y;
+    else if (nearest.y > bottomRight.y)
+        nearest.y = bottomRight.y;
+
+    return nearest;
 }
 bool Rect::IsOverlapping(const Rect& rect) const { return (*this & rect).Exists(); }
 float Rect::Width() const {

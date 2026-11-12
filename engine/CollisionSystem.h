@@ -51,11 +51,11 @@ public:
                     if (entityComp.worldBounds.Center().y > otherComp.worldBounds.Center().y) {
                         location.loc.y += overlap.Height();
                         movement.velocity.y = std::max(movement.velocity.y, 0.0f);
-                        entityComp.onGround = true;
+                        entityComp.onCeiling = true;
                     } else {
                         location.loc.y -= overlap.Height();
                         movement.velocity.y = std::min(movement.velocity.y, 0.0f);
-                        entityComp.onCeiling = true;
+                        entityComp.onGround = true;
                     }
                 }
             }
@@ -67,7 +67,7 @@ public:
 
         auto& collisionStore = em.template GetComponentStorage<CollisionComponent>();
 
-        for (auto dynamicPair : collisionStore) {
+        for (auto& dynamicPair : collisionStore) {
             CollisionComponent& dynamicComp = dynamicPair.second;
 
             if (!dynamicComp.isStatic) {
@@ -79,7 +79,7 @@ public:
 
                 Entity<Components...>& dynamicEntity = em.GetEntity(dynamicPair.first);
 
-                for (auto otherPair : collisionStore) {
+                for (auto& otherPair : collisionStore) {
                     if (dynamicPair.first == otherPair.first) continue;
                     // Entity<Components...>& otherEntity = em.GetEntity(otherPair.first);
                     CollisionComponent& otherComp = otherPair.second;

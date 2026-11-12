@@ -52,7 +52,8 @@ void WindowManager::DrawSpriteWorld(sf::Sprite& sprite, Point2D position) {
 }
 
 void WindowManager::DrawSpriteWindow(sf::Sprite& sprite, Point2D position) {
-    sprite.setPosition(position.AsSfmlVectorF());
+    sprite.setPosition(position.Round().AsSfmlVectorF());
+    sprite.setScale({1.0f / mWorldUnitsPerPixel, 1.0f / mWorldUnitsPerPixel});
 
     mWindow->draw(sprite);
 }
@@ -73,6 +74,14 @@ Rect WindowManager::WorldToWindow(const Rect& rect) const {
 
 Point2D WindowManager::WorldToWindow(const Point2D& pt) const {
     return (pt - mCameraPosition) / mWorldUnitsPerPixel + GetWindowSize() / 2.0f;
+}
+
+Point2D WindowManager::WorldDistanceToWindow(const Point2D& pt) const {
+    return pt / mWorldUnitsPerPixel;
+}
+
+Point2D WindowManager::WindowDistanceToWorld(const Point2D& pt) const {
+    return pt * mWorldUnitsPerPixel;
 }
 
 Point2D WindowManager::GetWorldCenter() const { return mCameraPosition; }

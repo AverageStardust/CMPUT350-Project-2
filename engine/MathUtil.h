@@ -41,7 +41,10 @@ struct Point2D {
     Point2D Min(Point2D other) const;
     Point2D Max(Point2D other) const;
     Point2D Abs() const;
+    Point2D Round() const;
     Point2D Sign() const;
+    Point2D Lerp(Point2D other, float fraction) const;
+    Point2D MoveTowards(Point2D other, float distance) const;
     Point2D PairwiseMult(Point2D other) const;
     Point2D PairwiseDiv(Point2D other) const;
     float Dot(Point2D other) const;
@@ -138,6 +141,7 @@ struct Rect {
     void Inset(int inset);
     Rect Inseted(int inset) const;
     bool IsInside(const Point2D& p) const;
+    Point2D NearestInside(const Point2D& p) const;
     bool IsOverlapping(const Rect& rect) const;
     float Width() const;
     float Height() const;
