@@ -18,6 +18,7 @@ struct CollisionComponent {
     uint8_t onRightWall : 1 = false;
     Rect localBounds = {};
     Rect worldBounds = {}; // Previous location
+    Point2D lastVelocity = {};
 };
 
 }  // namespace ECSEngine

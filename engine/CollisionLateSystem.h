@@ -31,6 +31,12 @@ public:
                 CollisionComponent& collisionComp = em.template GetComponent<CollisionComponent>(entity);
 
                 collisionComp.worldBounds = collisionComp.localBounds + locationComp.loc;
+
+
+                if (entity.template HasComponent<MovementComponent>()) {
+                    MovementComponent& movementComp = em.template GetComponent<MovementComponent>(entity);
+                    collisionComp.lastVelocity = movementComp.velocity;
+                }
             }
         }
 

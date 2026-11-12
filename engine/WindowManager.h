@@ -6,7 +6,7 @@
 
 namespace ECSEngine {
 
-const unsigned int FRAME_RATE = 60;
+const unsigned int FRAMES_PER_SECOND = 60;
 
 class WindowManager {
 public:

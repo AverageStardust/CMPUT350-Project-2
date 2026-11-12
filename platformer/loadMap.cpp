@@ -9,9 +9,11 @@
 #include "EntityManager.h"
 #include "LocationComponent.h"
 #include "MathUtil.h"
+#include "SpawnComponent.h"
 #include "SpriteComponent.h"
 #include "SpriteManager.h"
 #include "Storage.h"
+#include "WindowManager.h"
 #include "main.h"
 #include "resource.h"
 
@@ -111,7 +113,8 @@ std::unordered_map<char, TileType> ReadDictionary(Engine& engine, std::ifstream&
     return dictionary;
 }
 
-void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position) {
+void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position,
+             ECSEngine::SpriteID spawnSprite, ECSEngine::Point2D spawnSize) {
     ECSEngine::EntityManager<COMPONENTS>& entityManager = engine.GetEntityManager();
     ECSEngine::EntityID entity = entityManager.CreateEntity();
 
@@ -128,9 +131,19 @@ void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position) {
                                                   .doesDamage = type.symbol == 'x',
                                                   .localBounds = type.collisionBounds});
     }
+
+    if (type.symbol == 'S') {
+        entityManager.AddComponent(
+            entity, ECSEngine::SpawnComponent{.spawnSpriteID = spawnSprite,
+                                              .spawnSize = spawnSize,
+                                              .timeToNextSpawn = ECSEngine::FRAMES_PER_SECOND * 3,
+                                              .timeBetweenSpawns = ECSEngine::FRAMES_PER_SECOND,
+                                              .totalSpawns = 100});
+    }
 }
 
-void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, TileType>& dictonary) {
+void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, TileType>& dictonary,
+             ECSEngine::SpriteID spawnSprite, ECSEngine::Point2D spawnSize) {
     expectStr(file, "map");
     file >> std::ws;
 
@@ -162,7 +175,7 @@ void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, TileT
 
             if (symbol != '.') {
                 if (dictonary.contains(symbol)) {
-                    AddTile(engine, dictonary[symbol], position);
+                    AddTile(engine, dictonary[symbol], position, spawnSprite, spawnSize);
                 } else {
                     throw std::runtime_error("Undefined tile \"" + std::string{symbol} + "\"");
                 }
@@ -172,7 +185,8 @@ void ReadMap(Engine& engine, std::ifstream& file, std::unordered_map<char, TileT
     }
 }
 
-void LoadMap(Engine& engine, const std::string& path) {
+void LoadMap(Engine& engine, const std::string& path, ECSEngine::SpriteID spawnSprite,
+             ECSEngine::Point2D spawnSize) {
     std::ifstream file(path);
 
     if (!file.is_open()) {
@@ -180,7 +194,7 @@ void LoadMap(Engine& engine, const std::string& path) {
     }
 
     std::unordered_map<char, TileType> dictonary = ReadDictionary(engine, file);
-    ReadMap(engine, file, dictonary);
+    ReadMap(engine, file, dictonary, spawnSprite, spawnSize);
 
     if (!file.eof()) {
         throw std::runtime_error("Expected end of file");

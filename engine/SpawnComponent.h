@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Entity.h"
+#include "MathUtil.h"
 #include "SpriteManager.h"
 
 namespace ECSEngine {
@@ -9,8 +9,8 @@ namespace ECSEngine {
 // This is only defined if an entity also has a LocationComponent.
 class SpawnComponent {
 public:
-    EntityID entityID;  // The entity that this spawn component is attached to
-    SpriteID spawnTextureID;
+    SpriteID spawnSpriteID;
+    Point2D spawnSize;
     int timeToNextSpawn;
     int timeBetweenSpawns;  // in frames
     int totalSpawns;

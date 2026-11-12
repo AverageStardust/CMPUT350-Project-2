@@ -8,6 +8,7 @@
 #include "resource.h"
 
 int main(int argc, char* argv[]) {
+    srand(time(0));
     setupResources(argc, argv);
 
     // Engine test code
@@ -17,13 +18,15 @@ int main(int argc, char* argv[]) {
     // auto& som = engine.GetSoundManager();
     // ECSEngine::SoundID testSound = som.RegisterSound(resourcePath("sfx_gem.ogg"));
 
-    // Load maps
-    LoadMap(engine, resourcePath("sky.map"));
-    LoadMap(engine, resourcePath("testWorld.map"));
-
     // Managers
     auto& em = engine.GetEntityManager();
     auto& sp = engine.GetSpriteManager();
+
+    // Load maps
+    ECSEngine::SpriteID spawnerSprite = sp.RegisterSprite(
+        resourcePath("spritesheet-tiles-default.png"), {10 * 64 + 12, 5 * 64 + 12, 40, 40});
+    LoadMap(engine, resourcePath("sky.map"), spawnerSprite, {40, 40});
+    LoadMap(engine, resourcePath("testWorld.map"), spawnerSprite, {40, 40});
 
     // Place player
     ECSEngine::EntityID player = em.CreateEntity();

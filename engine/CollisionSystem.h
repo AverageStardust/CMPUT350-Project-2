@@ -29,6 +29,14 @@ public:
 
     void resolveCollision(EntityManager<Components...>& em, CollisionComponent& otherComp,
                           CollisionComponent& entityComp, Entity<Components...>& entity) {
+        bool massRatio = 1;
+
+        if (!otherComp.isStatic) {
+            float entityArea = entityComp.localBounds.Area();
+            float otherArea = otherComp.localBounds.Area();
+            massRatio = otherArea / (entityArea + otherArea);
+        }
+
         LocationComponent locationComp;
         if (entity.template HasComponent<LocationComponent>() &&
             entity.template HasComponent<MovementComponent>()) {
@@ -39,22 +47,26 @@ public:
                 MovementComponent& movement = em.template GetComponent<MovementComponent>(entity);
                 if (overlap.Width() < overlap.Height()) {
                     if (entityComp.worldBounds.Center().x > otherComp.worldBounds.Center().x) {
-                        location.loc.x += overlap.Width();
-                        movement.velocity.x = std::max(movement.velocity.x, 0.0f);
+                        location.loc.x += overlap.Width() * massRatio;
+                        movement.velocity.x +=
+                            (otherComp.lastVelocity.x - movement.velocity.x) * massRatio;
                         entityComp.onLeftWall = true;
                     } else {
-                        location.loc.x -= overlap.Width();
-                        movement.velocity.x = std::min(movement.velocity.x, 0.0f);
+                        location.loc.x -= overlap.Width() * massRatio;
+                        movement.velocity.x +=
+                            (otherComp.lastVelocity.x - movement.velocity.x) * massRatio;
                         entityComp.onRightWall = true;
                     }
                 } else {
                     if (entityComp.worldBounds.Center().y > otherComp.worldBounds.Center().y) {
-                        location.loc.y += overlap.Height();
-                        movement.velocity.y = std::max(movement.velocity.y, 0.0f);
+                        location.loc.y += overlap.Height() * massRatio;
+                        movement.velocity.y +=
+                            (otherComp.lastVelocity.y - movement.velocity.y) * massRatio;
                         entityComp.onCeiling = true;
                     } else {
-                        location.loc.y -= overlap.Height();
-                        movement.velocity.y = std::min(movement.velocity.y, 0.0f);
+                        location.loc.y -= overlap.Height() * massRatio;
+                        movement.velocity.y +=
+                            (otherComp.lastVelocity.y - movement.velocity.y) * massRatio;
                         entityComp.onGround = true;
                     }
                 }
@@ -85,12 +97,7 @@ public:
                     CollisionComponent& otherComp = otherPair.second;
 
                     if (dynamicComp.worldBounds.IsOverlapping(otherComp.worldBounds)) {
-                        bool largerInDynamicDynamicCollision =
-                            !otherComp.isStatic &&
-                            dynamicComp.localBounds.Area() > otherComp.localBounds.Area();
-
-                        if (!largerInDynamicDynamicCollision)
-                            resolveCollision(em, otherComp, dynamicComp, dynamicEntity);
+                        resolveCollision(em, otherComp, dynamicComp, dynamicEntity);
 
                         if (otherComp.doesDamage) applyDamage(em, dynamicEntity);
 

@@ -26,7 +26,7 @@ public:
                 LocationComponent& locationComp = em.template GetComponent<LocationComponent>(entity);
                 MovementComponent& movementComp = em.template GetComponent<MovementComponent>(entity);
 
-                locationComp.loc += movementComp.velocity / FRAME_RATE;
+                locationComp.loc += movementComp.velocity / FRAMES_PER_SECOND;
             }
         }
 

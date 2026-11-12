@@ -31,7 +31,7 @@ public:
                 CollisionComponent& collisionComp = em.template GetComponent<CollisionComponent>(entity);
 
                 if (!collisionComp.onGround) {
-                    movementComp.velocity += gravityComp.acceleration / FRAME_RATE;
+                    movementComp.velocity += gravityComp.acceleration / FRAMES_PER_SECOND;
                 }
             }
         }
