@@ -5,6 +5,7 @@
 #include "CollisionComponent.h"
 #include "EntityManager.h"
 #include "InputManager.h"
+#include "Keyboard.h"
 #include "LocationComponent.h"
 #include "MathUtil.h"
 #include "SoundManager.h"
@@ -41,6 +42,9 @@ public:
             mSoundManager.Cleanup();
 
             mInputManager.update(window);
+            if (mInputManager.KeyJustPressed(Key::Grave)) {
+                debug = !debug;
+            }
 
             // clear background
             window->clear(sf::Color::Black);
@@ -72,7 +76,6 @@ public:
     InputManager& GetInputManager() override { return mInputManager; }
 
 private:
-    bool ProcessEvents() { return true; };
     void DebugDraw() {
         // draw entities (temperary for testings)
         for (Entity entity : mEntityManager) {
@@ -86,7 +89,8 @@ private:
                 Rect rect = collision.localBounds + location.loc;
 
                 mWindowManager.DebugFrameRect(rect, 255, 0, 0, 255);
-                mWindowManager.DebugFrameRect(Rect{location.loc - 2, location.loc + 2}, 0, 255, 0, 255);
+                mWindowManager.DebugFrameRect(Rect{location.loc - 2, location.loc + 2}, 0, 255, 0,
+                                              255);
             }
         }
     };
@@ -98,7 +102,7 @@ private:
     WindowManager mWindowManager;
     InputManager mInputManager;
 
-    bool debug = true;
+    bool debug = false;
 };
 
 }  // namespace ECSEngine

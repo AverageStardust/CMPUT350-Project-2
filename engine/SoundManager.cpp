@@ -16,33 +16,29 @@ SoundID SoundManager::RegisterSound(const std::string& soundPath) {
     return (SoundID)managedBuffers.Store(buffer);
 }
 
-sf::Sound SoundManager::GetSound(SoundID soundID) {
+sf::Sound* SoundManager::GetSound(SoundID soundID) {
     sf::SoundBuffer& buffer = managedBuffers.Get(soundID);
-    return sf::Sound(buffer);
+    return new sf::Sound(buffer);
 }
 
 void SoundManager::Play(SoundID soundID, float volume) {
-    playingSounds.push_back({GetSound(soundID), 0});
-    sf::Sound& sound = playingSounds.back().first;
-    sound.setVolume(volume * 100);
-    sound.play();
+    Ticket playingSound = playingSounds.Store(GetSound(soundID));
+    sf::Sound* sound = playingSounds.Get(playingSound);
+    sound->setVolume(volume * 100);
+    sound->play();
 }
 
 void SoundManager::Cleanup() {
     // remove finished sounds created by Play( )
     // called by ECSEngine.Run( )
-    for (auto& pair : playingSounds) {
-        if (pair.first.getStatus() == sf::Sound::Status::Stopped) {
-            pair.second += 1.0f / FRAMES_PER_SECOND;
+    for (auto iter = playingSounds.begin(); iter != playingSounds.end(); iter++) {
+        sf::Sound* sound = *iter;
+
+        if (sound->getStatus() == sf::Sound::Status::Stopped) {
+            delete sound;
+            playingSounds.Remove(iter.GetTicket());
         }
     }
-
-    // remove when not playing for 3 second to prevent clipping
-    playingSounds.erase(std::remove_if(playingSounds.begin(), playingSounds.end(),
-                                       [](const auto& pair) {
-                                           return pair.second > 3;
-                                       }),
-                        playingSounds.end());
 }
 
 }  // namespace ECSEngine
