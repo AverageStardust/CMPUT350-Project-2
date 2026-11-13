@@ -48,6 +48,8 @@ private:
 
     template <typename... Any>
     friend class EntityManager;
+    template <typename Any>
+    friend class Storage;
 };
 
 }  // namespace ECSEngine

@@ -5,6 +5,8 @@
 #include "CollisionComponent.h"
 #include "EntityManager.h"
 #include "LocationComponent.h"
+#include "InputComponent.h"
+#include "ScoreComponent.h"
 #include "MathUtil.h"
 #include "SystemManager.h"
 
@@ -102,8 +104,13 @@ public:
                         if (otherComp.doesDamage) applyDamage(em, dynamicEntity);
 
                         // Handle collectables
-                        if (!dynamicComp.isCollectable && otherComp.isCollectable) {
-                            
+                        if (dynamicEntity.template HasComponent<InputComponent>() && otherComp.isCollectable) {
+                            em.RemoveEntity(otherPair.first);
+
+                            // auto& scoreStore = em.template GetComponentStorage<ScoreComponent>();
+                            // for (auto& scorePair : scoreStore) {
+                            //     scorePair.second.score += 6;
+                            // }
                         }
                     }
                 }

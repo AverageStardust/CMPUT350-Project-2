@@ -26,7 +26,7 @@ public:
         Storage<std::pair<EntityID, ScoreComponent>>& scoreStore =
             em.template GetComponentStorage<ScoreComponent>();
 
-        for (std::pair<EntityID, ScoreComponent> pair : scoreStore) {
+        for (std::pair<EntityID, ScoreComponent>& pair : scoreStore) {
             ScoreComponent& scoreComp = pair.second;
 
             int digitCount = sizeof(scoreComp.digitID) / sizeof(scoreComp.digitID[0]);
