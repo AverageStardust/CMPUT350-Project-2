@@ -119,7 +119,7 @@ public:
 
 private:
     template <typename U>  // U is either T or T&
-    Ticket storeInternal(U&& value) {
+    Ticket storeInternal(U value) {
         if (freeSlots.size() == 0) {
             // fill new slot
             slots.push_back(StorageSlot{.value = value, .generation = 1});
@@ -131,11 +131,10 @@ private:
             freeSlots.pop_back();
 
             // negate since it's currently freed (generation <= 0)
-            int32_t generation = -slots[index].generation;
+            int32_t generation = -slots[index].generation + 1;
 
             // increment generation
-            slots[index] =
-                StorageSlot{.value = std::forward<U>(value), .generation = generation + 1};
+            slots[index] = StorageSlot{.value = value, .generation = generation};
 
             return joinTicket(SplitTicket{index, generation});
         }
