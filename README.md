@@ -1,4 +1,47 @@
 # CMPUT 350 HW 2
 
-## Referances
+## Programming Referances
+- https://en.cppreference.com/cpp
+- https://www.sfml-dev.org/documentation/3.1.0/
 - https://www.internalpointers.com/post/writing-custom-iterators-modern-cpp
+
+## Implementation Notes
+
+- We are using a custom slotmap storage rather than the given storage system, implemented such that it's easy to go from iterating one component to getting it's entity ID.
+- Inputs are handled by an Input Manager.
+- The game keeps its speed and acceleration units in pixels/second and pixels/second^2. Thus it's nearly able to deal with variable framerate (however, the game is locked at 60fps because of the current drag implementation).
+- Dynamic camera screen percentages are slightly different from those listed in spec.
+- 67
+
+## Contributions
+### Wren Durbano
+- Custom storage system
+- MathUtil (copied from Project 1)
+- Map loading
+- Entity
+- Entity Manager
+- Window Manager
+- Input Manager
+- ECS Engine
+- Input System
+- Sprite System
+- Collision System
+- Input System
+- Jump & Dash
+- Player animation
+- Camera System & camera initialization
+- Screenshake
+- Spawner
+- General optimization, fixes, & polish
+- 67
+
+### Liam Latham
+- Sound Manager
+- Sprite Manager
+- CollisionLate System
+- Gravity System
+- Movement System
+- Spawn System
+- Score System
+- Create/initialize Player
+- Collectables
