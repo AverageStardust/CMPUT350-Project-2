@@ -37,7 +37,7 @@ public:
 
                 EntityID& digitID = scoreComp.digitID[i];
 
-                int placeValue = int(std::pow(10, sizeof(scoreComp.digitID) - i - 1));
+                int placeValue = int(std::pow(10, digitCount - i - 1));
                 int digitValue = (scoreComp.score / placeValue) % 10;
 
                 if (!em.template HasComponent<SpriteComponent>(digitID)) {

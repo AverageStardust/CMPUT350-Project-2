@@ -107,10 +107,10 @@ public:
                         if (dynamicEntity.template HasComponent<InputComponent>() && otherComp.isCollectable) {
                             em.RemoveEntity(otherPair.first);
 
-                            // auto& scoreStore = em.template GetComponentStorage<ScoreComponent>();
-                            // for (auto& scorePair : scoreStore) {
-                            //     scorePair.second.score += 6;
-                            // }
+                            auto& scoreStore = em.template GetComponentStorage<ScoreComponent>();
+                            for (auto& scorePair : scoreStore) {
+                                scorePair.second.score += 6;
+                            }
                         }
                     }
                 }
