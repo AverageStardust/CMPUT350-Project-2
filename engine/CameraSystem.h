@@ -31,6 +31,9 @@ public:
             CameraComponent& camera = cameraPair.second;
             if (camera.active == false) continue;
 
+            Point2D cameraPosition = {camera.position.x, 384};
+            wm.SetWorldCenter(cameraPosition);
+
             if (entity.template HasComponent<CameraFollower>()) {
                 CameraFollower& follower = em.template GetComponent<CameraFollower>(entity);
                 if (em.template HasComponent<LocationComponent>(follower.targetID)) {
@@ -48,8 +51,6 @@ public:
                     }
                 }
             }
-
-            Point2D cameraPosition = {camera.position.x, 384};
 
             if (entity.template HasComponent<CameraShake>()) {
                 CameraShake& shake = em.template GetComponent<CameraShake>(entity);

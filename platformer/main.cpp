@@ -26,12 +26,12 @@ int main(int argc, char* argv[]) {
     ECSEngine::SpriteID spawnerSprite = sp.RegisterSprite(
         resourcePath("spritesheet-tiles-default.png"), {10 * 64 + 12, 5 * 64 + 12, 40, 40});
     LoadMap(engine, resourcePath("sky.map"), spawnerSprite, {40, 40});
-    LoadMap(engine, resourcePath("testWorld.map"), spawnerSprite, {40, 40});
+    LoadMap(engine, resourcePath("world.map"), spawnerSprite, {40, 40});
 
     // Place player
     ECSEngine::EntityID player = em.CreateEntity();
 
-    ECSEngine::Point2D playerStartPos = ECSEngine::Point2D(128, 512);
+    ECSEngine::Point2D playerStartPos = ECSEngine::Point2D(768, 512);
     em.AddComponent(player, ECSEngine::LocationComponent{.loc = playerStartPos});
     em.AddComponent(player, ECSEngine::MovementComponent{.velocity = ECSEngine::Point2D(0, 0)});
     em.AddComponent(player, ECSEngine::GravityComponent{.acceleration = ECSEngine::Point2D(0, 300),
