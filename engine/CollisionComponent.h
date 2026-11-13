@@ -10,6 +10,7 @@
 namespace ECSEngine {
 
 struct CollisionComponent {
+    uint8_t isCollectable : 1 = false;
     uint8_t isStatic : 1 = false;
     uint8_t doesDamage : 1 = false;
     uint8_t onGround : 1 = false;

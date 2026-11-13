@@ -101,7 +101,10 @@ public:
 
                         if (otherComp.doesDamage) applyDamage(em, dynamicEntity);
 
-                        // Handle collectibles?
+                        // Handle collectables
+                        if (!dynamicComp.isCollectable && otherComp.isCollectable) {
+                            
+                        }
                     }
                 }
             }

@@ -50,12 +50,13 @@ public:
                                                         .worldSpace = true});
 
                         em.AddComponent(spawnedID, CollisionComponent{
+                                                       .isCollectable = true,
                                                        .localBounds = {spawnComp.spawnSize / -2,
                                                                        spawnComp.spawnSize / 2}});
 
-                        em.AddComponent(
-                            spawnedID, MovementComponent{.velocity = Point2D((rand() % 256) - 128,
-                                                                             -(rand() % 128))});
+                        em.AddComponent(spawnedID,
+                                        MovementComponent{.velocity = Point2D((rand() % 256) - 128,
+                                                                              -(rand() % 128))});
 
                         em.AddComponent(spawnedID, GravityComponent(Point2D(0, 100), 0));
                     }
