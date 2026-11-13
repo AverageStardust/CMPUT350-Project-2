@@ -24,7 +24,7 @@ struct CameraFollower {
 
 struct CameraShake {
     int frameTime = 0;
-    Point2D offset = {};
+    Point2D direction = {};
 };
 
 }  // namespace ECSEngine

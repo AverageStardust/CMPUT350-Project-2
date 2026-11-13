@@ -43,8 +43,8 @@ public:
                             windowPosition - follower.hardExclusion.NearestInside(windowPosition);
                         camera.position += wm.WindowDistanceToWorld(screenDistance);
                     } else if (!follower.softExclusion.IsInside(windowPosition)) {
-                        camera.position = camera.position.MoveTowards(targetLocation.loc,
-                                                                      follower.speed / FRAMES_PER_SECOND);
+                        camera.position = camera.position.MoveTowards(
+                            targetLocation.loc, follower.speed / FRAMES_PER_SECOND);
                     }
                 }
             }
@@ -55,12 +55,9 @@ public:
                 CameraShake& shake = em.template GetComponent<CameraShake>(entity);
                 if (shake.frameTime > 0) {
                     shake.frameTime--;
-                    shake.offset = shake.offset.Lerp({float((rand() % 32) - 16), float((rand() % 32) - 16)}, 0.1);
-                } else {
-                    shake.offset = shake.offset.Lerp({0, 0}, 0.1);
+                    cameraPosition +=
+                        shake.direction * float((rand() % 256) - 128) * shake.frameTime / 1024;
                 }
-
-                cameraPosition += shake.offset;
             }
 
             wm.SetWorldCenter(cameraPosition);

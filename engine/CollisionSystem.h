@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "CameraComponent.h"
 #include "CollisionComponent.h"
 #include "EntityManager.h"
 #include "InputComponent.h"
@@ -29,6 +30,23 @@ public:
         }
     }
 
+    void applyScreenShake(EntityManager<Components...>& em, const Rect& overlap, const Point2D& changeInVelocity) {
+        Point2D shake;
+        if (overlap.Width() < overlap.Height()) {
+            shake = Point2D{changeInVelocity.x, 0};
+        } else {
+            shake = Point2D{0, changeInVelocity.y};
+        }
+
+        if (shake.Length() > 25) {
+            auto& CameraShakeStore = em.template GetComponentStorage<CameraShake>();
+            for (auto& cameraShakePair : CameraShakeStore) {
+                cameraShakePair.second.direction = shake.Normalized();
+                cameraShakePair.second.frameTime = shake.Length() / 10;
+            }
+        }
+    }
+
     void resolveCollision(EntityManager<Components...>& em, CollisionComponent& otherComp,
                           CollisionComponent& entityComp, Entity<Components...>& entity) {
         bool massRatio = 1;
@@ -49,8 +67,13 @@ public:
                 MovementComponent& movement = em.template GetComponent<MovementComponent>(entity);
 
                 Point2D changeInVelocity = otherComp.lastVelocity - movement.velocity;
-                if (entityComp.isCollectable && !otherComp.isCollectable) {  // remove !otherComp.isCollectable for fun times
+                if (entityComp.isCollectable &&
+                    !otherComp.isCollectable) {  // remove !otherComp.isCollectable for fun times
                     changeInVelocity += entityComp.lastVelocity * -0.7f * massRatio;
+                }
+
+                if (entity.template HasComponent<InputComponent>()) {
+                    applyScreenShake(em, overlap, changeInVelocity * massRatio);
                 }
 
                 if (overlap.Width() < overlap.Height()) {
