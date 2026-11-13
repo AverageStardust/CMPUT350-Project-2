@@ -22,13 +22,14 @@ public:
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
         EntityManager<Components...>& em = engine->GetEntityManager();
+        auto& collisionStore = em.template GetComponentStorage<CollisionComponent>();
 
-        for (Entity entity : em) {
-            if (entity.template HasComponent<CollisionComponent>() &&
-                entity.template HasComponent<LocationComponent>()) {
+        for (auto& collisionPair : collisionStore) {
+            Entity<Components...>& entity = em.GetEntity(collisionPair.first);
 
+            if (entity.template HasComponent<LocationComponent>()) {
+                CollisionComponent& collisionComp = collisionPair.second;
                 LocationComponent& locationComp = em.template GetComponent<LocationComponent>(entity);
-                CollisionComponent& collisionComp = em.template GetComponent<CollisionComponent>(entity);
 
                 collisionComp.worldBounds = collisionComp.localBounds + locationComp.loc;
 

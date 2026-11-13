@@ -22,11 +22,12 @@ public:
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
         EntityManager<Components...>& em = engine->GetEntityManager();
+        auto& spawnStore = em.template GetComponentStorage<SpawnComponent>();
 
-        for (Entity entity : em) {
-            if (entity.template HasComponent<SpawnComponent>() &&
-                entity.template HasComponent<LocationComponent>()) {
-                SpawnComponent& spawnComp = em.template GetComponent<SpawnComponent>(entity);
+        for (auto& spawnPair : spawnStore) {
+            Entity<Components...>& entity = em.GetEntity(spawnPair.first);
+            if (entity.template HasComponent<LocationComponent>()) {
+                SpawnComponent& spawnComp = spawnPair.second;
                 LocationComponent& locationComp =
                     em.template GetComponent<LocationComponent>(entity);
 

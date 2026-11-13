@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include "SystemManager.h"
 #include "EntityManager.h"
 #include "LocationComponent.h"
+#include "SystemManager.h"
 #include "WindowManager.h"
 
 namespace ECSEngine {
@@ -19,12 +19,16 @@ public:
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
         EntityManager<Components...>& em = engine->GetEntityManager();
-        for (Entity entity : em) {
-            if (entity.template HasComponent<LocationComponent>() &&
-                entity.template HasComponent<MovementComponent>()) {
 
-                LocationComponent& locationComp = em.template GetComponent<LocationComponent>(entity);
-                MovementComponent& movementComp = em.template GetComponent<MovementComponent>(entity);
+        auto& movementStore = em.template GetComponentStorage<MovementComponent>();
+
+        for (auto& movementPair : movementStore) {
+            Entity<Components...>& entity = em.GetEntity(movementPair.first);
+
+            if (entity.template HasComponent<LocationComponent>()) {
+                MovementComponent& movementComp = movementPair.second;
+                LocationComponent& locationComp =
+                    em.template GetComponent<LocationComponent>(entity);
 
                 locationComp.loc += movementComp.velocity / FRAMES_PER_SECOND;
             }

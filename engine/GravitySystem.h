@@ -2,11 +2,11 @@
 
 #include <string>
 
-#include "EntityManager.h"
-#include "WindowManager.h"
-#include "SystemManager.h"
-#include "LocationComponent.h"
 #include "CollisionComponent.h"
+#include "EntityManager.h"
+#include "LocationComponent.h"
+#include "SystemManager.h"
+#include "WindowManager.h"
 
 namespace ECSEngine {
 
@@ -20,15 +20,19 @@ public:
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
         EntityManager<Components...>& em = engine->GetEntityManager();
+        auto& gravityStore = em.template GetComponentStorage<GravityComponent>();
 
-        for (Entity entity : em) {
-            if (entity.template HasComponent<GravityComponent>() &&
-                entity.template HasComponent<MovementComponent>() &&
+        for (auto& gravityPair : gravityStore) {
+            Entity<Components...>& entity = em.GetEntity(gravityPair.first);
+
+            if (entity.template HasComponent<MovementComponent>() &&
                 entity.template HasComponent<CollisionComponent>()) {
 
-                GravityComponent& gravityComp = em.template GetComponent<GravityComponent>(entity);
-                MovementComponent& movementComp = em.template GetComponent<MovementComponent>(entity);
-                CollisionComponent& collisionComp = em.template GetComponent<CollisionComponent>(entity);
+                GravityComponent& gravityComp = gravityPair.second;
+                MovementComponent& movementComp =
+                    em.template GetComponent<MovementComponent>(entity);
+                CollisionComponent& collisionComp =
+                    em.template GetComponent<CollisionComponent>(entity);
 
                 if (!collisionComp.onGround) {
                     movementComp.velocity += gravityComp.acceleration / FRAMES_PER_SECOND;
