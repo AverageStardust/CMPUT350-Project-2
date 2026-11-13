@@ -72,7 +72,6 @@ public:
     InputManager& GetInputManager() override { return mInputManager; }
 
 private:
-    bool ProcessEvents() { return true; };
     void DebugDraw() {
         // draw entities (temperary for testings)
         for (Entity entity : mEntityManager) {
@@ -98,7 +97,7 @@ private:
     WindowManager mWindowManager;
     InputManager mInputManager;
 
-    bool debug = true;
+    bool debug = false;
 };
 
 }  // namespace ECSEngine
