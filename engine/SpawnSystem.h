@@ -41,7 +41,7 @@ public:
 
                         // Add basic components
                         Point2D spawnLocation =
-                            locationComp.loc + Point2D{32, -32 - spawnComp.spawnSize.y / 2};
+                            locationComp.loc + Point2D{32, -8 - spawnComp.spawnSize.y / 2};
                         em.AddComponent(spawnedID, LocationComponent{.loc = spawnLocation});
 
                         em.AddComponent(spawnedID,

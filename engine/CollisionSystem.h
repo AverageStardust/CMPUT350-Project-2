@@ -49,8 +49,8 @@ public:
                 MovementComponent& movement = em.template GetComponent<MovementComponent>(entity);
 
                 Point2D changeInVelocity = otherComp.lastVelocity - movement.velocity;
-                if (entityComp.isCollectable) {
-                    changeInVelocity += movement.velocity * -0.4f * massRatio;
+                if (entityComp.isCollectable && !otherComp.isCollectable) {  // remove !otherComp.isCollectable for fun times
+                    changeInVelocity += entityComp.lastVelocity * -0.7f * massRatio;
                 }
 
                 if (overlap.Width() < overlap.Height()) {
