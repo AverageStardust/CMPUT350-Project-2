@@ -21,12 +21,12 @@ public:
      * The callee is responsible to keep the sound in memory until it's finished, and then free it.
      * If you don't want this, use Play( ) instead
      */
-    sf::Sound GetSound(SoundID soundName);
+    sf::Sound* GetSound(SoundID soundName);
     void Play(SoundID soundName, float volume = 1);
 
 private:
     Storage<sf::SoundBuffer> managedBuffers;
-    std::vector<std::pair<sf::Sound, float>> playingSounds;
+    Storage<sf::Sound*> playingSounds;
 
     void Cleanup();
 

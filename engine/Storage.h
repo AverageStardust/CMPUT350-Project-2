@@ -4,7 +4,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
 #include <vector>
 
 namespace ECSEngine {
@@ -88,7 +87,8 @@ public:
         if (!isValid(splitTicket)) return;
 
         // negate generation since it's becoming free
-        slots[splitTicket.index] = StorageSlot{.value = T{}, .generation = -splitTicket.generation};
+        slots[splitTicket.index].value.~T();
+        slots[splitTicket.index].generation = -splitTicket.generation;
 
         freeSlots.push_back(splitTicket.index);
     }
