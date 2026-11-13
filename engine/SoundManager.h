@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include "SFML/Audio/Sound.hpp"
@@ -21,11 +22,11 @@ public:
      * If you don't want this, use Play( ) instead
      */
     sf::Sound GetSound(SoundID soundName);
-    void Play(SoundID soundName);
+    void Play(SoundID soundName, float volume = 1);
 
 private:
-    Storage<sf::SoundBuffer> managedSounds;
-    std::vector<sf::Sound> playingSounds;
+    Storage<sf::SoundBuffer> managedBuffers;
+    std::vector<std::pair<sf::Sound, float>> playingSounds;
 
     void Cleanup();
 

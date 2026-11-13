@@ -31,8 +31,8 @@ public:
     Point2D WorldDistanceToWindow(const Point2D& pt) const;
     Point2D WindowDistanceToWorld(const Point2D& pt) const;
 
-    void DrawSpriteWorld(sf::Sprite& sprite, Point2D position, bool flip);
-    void DrawSpriteWindow(sf::Sprite& sprite, Point2D position, bool flip);
+    void DrawSpriteWorld(sf::Sprite& sprite, Point2D position, bool flip = false);
+    void DrawSpriteWindow(sf::Sprite& sprite, Point2D position, float scale = 1, bool flip = false);
 
     void DebugDrawRect(const Rect& rect, int red, int green, int blue, int alpha = 255);
     void DebugFrameRect(const Rect& rect, int red, int green, int blue, int alpha = 255);

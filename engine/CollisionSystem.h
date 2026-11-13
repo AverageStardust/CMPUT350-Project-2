@@ -31,20 +31,31 @@ public:
         }
     }
 
-    void applyScreenShake(EngineView<Components...>* engine, const Rect& overlap,
-                          const Point2D& changeInVelocity) {
+    void applyScreenShake(EngineView<Components...>* engine, InputComponent& input,
+                          const Rect& overlap, const Point2D& changeInVelocity, float massRatio) {
         Point2D shake;
+        float volume = 0;
         if (overlap.Width() < overlap.Height()) {
-            shake = Point2D{changeInVelocity.x, 0};
+            shake = Point2D{changeInVelocity.x * massRatio, 0};
         } else {
-            shake = Point2D{0, changeInVelocity.y};
+            shake = Point2D{0, changeInVelocity.y * massRatio};
+
+            if (shake.y < 0) {
+                volume = std::min(1.0f, std::abs(shake.y) / 2500);
+            }
+        }
+
+        if (volume > 0.1) {
+            SoundManager& sm = engine->GetSoundManager();
+            sm.Play(input.landingSound, volume);
         }
 
         CameraSystem<Components...>::ApplyScreenShake(engine, shake);
     }
 
-    void resolveCollision(EngineView<Components...>* engine, EntityManager<Components...>& em, CollisionComponent& otherComp,
-                          CollisionComponent& entityComp, Entity<Components...>& entity) {
+    void resolveCollision(EngineView<Components...>* engine, EntityManager<Components...>& em,
+                          CollisionComponent& otherComp, CollisionComponent& entityComp,
+                          Entity<Components...>& entity) {
         bool massRatio = 1;
 
         if (!otherComp.isStatic) {
@@ -68,7 +79,8 @@ public:
             }
 
             if (entity.template HasComponent<InputComponent>()) {
-                applyScreenShake(engine, overlap, changeInVelocity * massRatio);
+                InputComponent& input = em.template GetComponent<InputComponent>(entity);
+                applyScreenShake(engine, input, overlap, changeInVelocity, massRatio);
             }
 
             if (overlap.Width() < overlap.Height()) {

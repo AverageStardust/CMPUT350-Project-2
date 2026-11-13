@@ -21,10 +21,10 @@ const float kAirRunAcceleration = 10;
 
 const int kCoyoteTime = 9;
 const int kJumpBufferTime = 9;
-const int kVerticalJumpTime = 10;
-const int kWallJumpTime = 6;
+const int kVerticalJumpTime = 7;
+const int kWallJumpTime = 4;
 const float kJumpInitalAcceleration = 400;
-const float kJumpExtendedAcceleration = 55;
+const float kJumpExtendedAcceleration = 75;
 const float kJumpWallVerticalAcceleration = 320;
 const float kJumpWallHorizontalAcceleration = 200;
 
@@ -108,8 +108,9 @@ private:
         inputComp.dashLockout = kDashDelay;
     }
 
-    void attempDash(EngineView<Components...>* engine, InputManager& im, InputComponent& inputComp,
-                    MovementComponent& movementComp, GravityComponent& gravityComp) {
+    void attempDash(EngineView<Components...>* engine, SoundManager& sm, InputManager& im,
+                    InputComponent& inputComp, MovementComponent& movementComp,
+                    GravityComponent& gravityComp) {
         if (inputComp.dashesLeft > 0 && inputComp.dashLockout == 0) {
             if (im.KeyIsDown(Key::D) && !im.KeyIsDown(Key::A)) {
                 movementComp.velocity.x = kDashVelocity;
@@ -117,25 +118,28 @@ private:
                 gravityComp.disabledTime = kDashInterval;
                 consumeDash(inputComp);
                 CameraSystem<Components...>::ApplyScreenShake(engine, {kDashVelocity, 0});
+                sm.Play(inputComp.dashSound, 0.7);
             } else if (im.KeyIsDown(Key::A) && !im.KeyIsDown(Key::D)) {
                 movementComp.velocity.x = -kDashVelocity;
                 movementComp.velocity.y = 0;
                 gravityComp.disabledTime = kDashInterval;
                 consumeDash(inputComp);
                 CameraSystem<Components...>::ApplyScreenShake(engine, {-kDashVelocity, 0});
+                sm.Play(inputComp.dashSound, 0.7);
             }
         }
     }
 
-    void handleJumpingAndDashing(EngineView<Components...>* engine, InputManager& im,
-                                 InputComponent& inputComp, MovementComponent& movementComp,
-                                 GravityComponent& gravityComp) {
+    void handleJumpingAndDashing(EngineView<Components...>* engine, SoundManager& sm,
+                                 InputManager& im, InputComponent& inputComp,
+                                 MovementComponent& movementComp, GravityComponent& gravityComp) {
         if (inputComp.jumpBufferTime > 0) {
             // veritcal jump
             if (inputComp.timeSinceGround < kCoyoteTime) {
                 lockJump(inputComp);
                 inputComp.jumpTime = kVerticalJumpTime;
                 movementComp.velocity.y = -kJumpInitalAcceleration;
+                sm.Play(inputComp.jumpSound, 0.4);
             } else if (inputComp.timeSinceLeftWall < kCoyoteTime &&
                        inputComp.timeSinceLeftWall < inputComp.timeSinceRightWall) {
                 // wall jump left
@@ -143,31 +147,43 @@ private:
                 inputComp.jumpTime = kWallJumpTime;
                 movementComp.velocity.x = kJumpWallHorizontalAcceleration;
                 movementComp.velocity.y = -kJumpWallVerticalAcceleration;
+                sm.Play(inputComp.jumpSound, 0.3);
             } else if (inputComp.timeSinceRightWall < kCoyoteTime) {
                 // wall jump right
                 lockJump(inputComp);
                 inputComp.jumpTime = kWallJumpTime;
                 movementComp.velocity.x = -kJumpWallHorizontalAcceleration;
                 movementComp.velocity.y = -kJumpWallVerticalAcceleration;
+                sm.Play(inputComp.jumpSound, 0.3);
             } else {
-                attempDash(engine, im, inputComp, movementComp, gravityComp);
+                attempDash(engine, sm, im, inputComp, movementComp, gravityComp);
             }
         } else if (inputComp.jumpTime > 0) {
             // extended jump
-            inputComp.jumpTime--;
             if (im.KeyIsDown(Key::Space)) {
                 movementComp.velocity.y -= kJumpExtendedAcceleration;
+                if (inputComp.jumpTime == 2) {
+                    sm.Play(inputComp.jumpHighSound, 0.6);
+                }
             }
+            inputComp.jumpTime--;
         }
     }
 
-    void handleWallSliding(InputManager& im, MovementComponent& movementComp,
-                           CollisionComponent& collisionComp) {
+    void handleWallSliding(SoundManager& sm, InputManager& im, InputComponent& inputComp,
+                           MovementComponent& movementComp, CollisionComponent& collisionComp) {
         // wall slide
         if (((im.KeyIsDown(Key::D) && collisionComp.onRightWall) ||
              (im.KeyIsDown(Key::A) && collisionComp.onLeftWall)) &&
             movementComp.velocity.y > 0) {
             movementComp.velocity.y *= 1.0f - kWallSlideFriction;
+            if (inputComp.slideSoundTimeout <= 0) {
+                sm.Play(inputComp.landingSound, 0.03);
+                inputComp.slideSoundTimeout = 5;
+            }
+            inputComp.slideSoundTimeout--;
+        } else {
+            inputComp.slideSoundTimeout = 0;
         }
     }
 
@@ -183,8 +199,9 @@ private:
         }
     }
 
-    void handleAnimation(InputComponent& inputComp, MovementComponent& movementComp,
-                         CollisionComponent& collisionComp, SpriteComponent& spriteComp) {
+    void handleAnimation(SoundManager& sm, InputComponent& inputComp,
+                         MovementComponent& movementComp, CollisionComponent& collisionComp,
+                         SpriteComponent& spriteComp) {
         if (std::abs(movementComp.velocity.x) > 30) {
             spriteComp.flip = movementComp.velocity.x < 0;
         }
@@ -192,21 +209,22 @@ private:
         if (collisionComp.onGround) {
             if (std::abs(movementComp.velocity.x) < 30) {
                 spriteComp.spriteID = inputComp.idleSprite;
-                inputComp.walkCycle = 0;
+                inputComp.walkCycle = 0.6;
             } else {
                 inputComp.walkCycle += 0.01 + std::abs(movementComp.velocity.x) / 6000;
                 if (inputComp.walkCycle > 1) {
                     inputComp.walkCycle -= 1;
+                    sm.Play(inputComp.footstepSound, 0.12);
                 }
 
                 if (inputComp.walkCycle < 0.5) {
-                    spriteComp.spriteID = inputComp.walk1Sprite;
-                } else {
                     spriteComp.spriteID = inputComp.walk2Sprite;
+                } else {
+                    spriteComp.spriteID = inputComp.walk1Sprite;
                 }
             }
         } else {
-            inputComp.walkCycle = 0;
+            inputComp.walkCycle = 0.6;
             if (inputComp.dashLockout > 0) {
                 spriteComp.spriteID = inputComp.dashSprite;
             } else {
@@ -227,7 +245,7 @@ public:
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
         InputManager& im = engine->GetInputManager();
-        // SoundManager& sm = engine->GetSoundManager();
+        SoundManager& sm = engine->GetSoundManager();
         EntityManager<Components...>& em = engine->GetEntityManager();
         auto& inputStore = em.template GetComponentStorage<InputComponent>();
 
@@ -248,10 +266,10 @@ public:
 
                 handleRunning(im, movementComp, collisionComp);
                 handleCoyoteAndBuffering(im, inputComp, collisionComp);
-                handleJumpingAndDashing(engine, im, inputComp, movementComp, gravityComp);
-                handleWallSliding(im, movementComp, collisionComp);
+                handleJumpingAndDashing(engine, sm, im, inputComp, movementComp, gravityComp);
+                handleWallSliding(sm, im, inputComp, movementComp, collisionComp);
                 handleFriction(movementComp, collisionComp);
-                handleAnimation(inputComp, movementComp, collisionComp, spriteComp);
+                handleAnimation(sm, inputComp, movementComp, collisionComp, spriteComp);
             }
         }
 

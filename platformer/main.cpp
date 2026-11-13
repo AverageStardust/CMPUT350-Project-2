@@ -15,8 +15,14 @@ int main(int argc, char* argv[]) {
     Engine engine(1024, 768, "Test Engine");
 
     // Load sounds
-    // auto& som = engine.GetSoundManager();
-    // ECSEngine::SoundID testSound = som.RegisterSound(resourcePath("sfx_gem.ogg"));
+    auto& som = engine.GetSoundManager();
+    ECSEngine::SoundID footstepSound =
+        som.RegisterSound(resourcePath("footstep_grass_003.ogg"));
+    ECSEngine::SoundID landingSound =
+        som.RegisterSound(resourcePath("footstep_snow_001.ogg"));
+    ECSEngine::SoundID jumpSound = som.RegisterSound(resourcePath("sfx_jump.ogg"));
+    ECSEngine::SoundID jumpHighSound = som.RegisterSound(resourcePath("sfx_jump-high.ogg"));
+    ECSEngine::SoundID dashSound = som.RegisterSound(resourcePath("laserLarge_000.ogg"));
 
     // Managers
     auto& em = engine.GetEntityManager();
@@ -28,6 +34,15 @@ int main(int argc, char* argv[]) {
     LoadMap(engine, resourcePath("sky.map"), spawnerSprite, {40, 40});
     LoadMap(engine, resourcePath("world.map"), spawnerSprite, {40, 40});
 
+    // Load sprites
+    std::string characterSheet = resourcePath("spritesheet-characters-default.png");
+    ECSEngine::SpriteID idleSprite = sp.RegisterSprite(characterSheet, {128, 768, 128, 128});
+    ECSEngine::SpriteID walk1Sprite = sp.RegisterSprite(characterSheet, {128, 128, 128, 128});
+    ECSEngine::SpriteID walk2Sprite = sp.RegisterSprite(characterSheet, {128, 256, 128, 128});
+    ECSEngine::SpriteID jumpSprite = sp.RegisterSprite(characterSheet, {128, 384, 128, 128});
+    ECSEngine::SpriteID fallSprite = sp.RegisterSprite(characterSheet, {128, 640, 128, 128});
+    ECSEngine::SpriteID dashSprite = sp.RegisterSprite(characterSheet, {128, 896, 128, 128});
+
     // Place player
     ECSEngine::EntityID player = em.CreateEntity();
 
@@ -38,16 +53,9 @@ int main(int argc, char* argv[]) {
                     ECSEngine::GravityComponent{.acceleration = ECSEngine::Point2D(0, 700)});
     em.AddComponent(player, ECSEngine::RespawnComponent{.loc = playerStartPos});
 
-    std::string characterSheet = resourcePath("spritesheet-characters-default.png");
-    ECSEngine::SpriteID idleSprite = sp.RegisterSprite(characterSheet, {128, 768, 128, 128});
-    ECSEngine::SpriteID walk1Sprite = sp.RegisterSprite(characterSheet, {128, 128, 128, 128});
-    ECSEngine::SpriteID walk2Sprite = sp.RegisterSprite(characterSheet, {128, 256, 128, 128});
-    ECSEngine::SpriteID jumpSprite = sp.RegisterSprite(characterSheet, {128, 384, 128, 128});
-    ECSEngine::SpriteID fallSprite = sp.RegisterSprite(characterSheet, {128, 640, 128, 128});
-    ECSEngine::SpriteID dashSprite = sp.RegisterSprite(characterSheet, {128, 896, 128, 128});
-
     em.AddComponent(player, ECSEngine::InputComponent(idleSprite, walk1Sprite, walk2Sprite,
-                                                      jumpSprite, fallSprite, dashSprite, 1));
+                                                      jumpSprite, fallSprite, dashSprite, footstepSound, landingSound, jumpSound, jumpHighSound, dashSound, 1));
+
     em.AddComponent(
         player, ECSEngine::CollisionComponent{.localBounds = ECSEngine::Rect(-22, -70, 44, 70)});
 

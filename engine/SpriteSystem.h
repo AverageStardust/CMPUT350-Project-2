@@ -43,7 +43,7 @@ public:
             if (spriteComp.worldSpace) {
                 wm.DrawSpriteWorld(sprite, location + spriteComp.offset, spriteComp.flip);
             } else {
-                wm.DrawSpriteWindow(sprite, location + spriteComp.offset, spriteComp.flip);
+                wm.DrawSpriteWindow(sprite, location + spriteComp.offset, 1, spriteComp.flip);
             }
         }
 
