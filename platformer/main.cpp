@@ -31,10 +31,10 @@ int main(int argc, char* argv[]) {
     // Place player
     ECSEngine::EntityID player = em.CreateEntity();
 
-    ECSEngine::Point2D playerStartPos = ECSEngine::Point2D(128, 128);
+    ECSEngine::Point2D playerStartPos = ECSEngine::Point2D(128, 512);
     em.AddComponent(player, ECSEngine::LocationComponent{.loc = playerStartPos});
     em.AddComponent(player, ECSEngine::MovementComponent{.velocity = ECSEngine::Point2D(0, 0)});
-    em.AddComponent(player, ECSEngine::GravityComponent{.acceleration = ECSEngine::Point2D(10, 100),
+    em.AddComponent(player, ECSEngine::GravityComponent{.acceleration = ECSEngine::Point2D(0, 300),
                                                         .disabledTimer = 0});
     em.AddComponent(player, ECSEngine::RespawnComponent{.loc = playerStartPos});
 

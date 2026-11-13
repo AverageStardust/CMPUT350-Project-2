@@ -59,7 +59,7 @@ public:
                                         MovementComponent{.velocity = Point2D((rand() % 512) - 256,
                                                                               -(rand() % 128))});
 
-                        em.AddComponent(spawnedID, GravityComponent(Point2D(0, 100), 0));
+                        em.AddComponent(spawnedID, GravityComponent{.acceleration = {0, 150}});
                     }
                 }
             }

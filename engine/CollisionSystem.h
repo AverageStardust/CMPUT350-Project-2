@@ -13,6 +13,8 @@
 
 namespace ECSEngine {
 
+const float kEpsilon = 0.1;
+
 template <typename... Components>
 class CollisionSystem : public System<Components...> {
 public:
@@ -30,7 +32,8 @@ public:
         }
     }
 
-    void applyScreenShake(EntityManager<Components...>& em, const Rect& overlap, const Point2D& changeInVelocity) {
+    void applyScreenShake(EntityManager<Components...>& em, const Rect& overlap,
+                          const Point2D& changeInVelocity) {
         Point2D shake;
         if (overlap.Width() < overlap.Height()) {
             shake = Point2D{changeInVelocity.x, 0};
@@ -78,24 +81,24 @@ public:
 
                 if (overlap.Width() < overlap.Height()) {
                     if (entityComp.worldBounds.Center().x > otherComp.worldBounds.Center().x) {
-                        location.loc.x += overlap.Width() * massRatio;
+                        location.loc.x += std::max(0.0f, overlap.Width() * massRatio - kEpsilon);
                         if (movement.velocity.x < otherComp.lastVelocity.x)
                             movement.velocity.x += changeInVelocity.x * massRatio;
                         entityComp.onLeftWall = true;
                     } else {
-                        location.loc.x -= overlap.Width() * massRatio;
+                        location.loc.x -= std::max(0.0f, overlap.Width() * massRatio - kEpsilon);
                         if (movement.velocity.x > otherComp.lastVelocity.x)
                             movement.velocity.x += changeInVelocity.x * massRatio;
                         entityComp.onRightWall = true;
                     }
                 } else {
                     if (entityComp.worldBounds.Center().y > otherComp.worldBounds.Center().y) {
-                        location.loc.y += overlap.Height() * massRatio;
+                        location.loc.y += std::max(0.0f, overlap.Height() * massRatio - kEpsilon);
                         if (movement.velocity.y < otherComp.lastVelocity.y)
                             movement.velocity.y += changeInVelocity.y * massRatio;
                         entityComp.onCeiling = true;
                     } else {
-                        location.loc.y -= overlap.Height() * massRatio;
+                        location.loc.y -= std::max(0.0f, overlap.Height() * massRatio - kEpsilon);
                         if (movement.velocity.y > otherComp.lastVelocity.y)
                             movement.velocity.y += changeInVelocity.y * massRatio;
                         entityComp.onGround = true;
