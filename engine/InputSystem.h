@@ -10,6 +10,7 @@
 #include "Keyboard.h"
 #include "LocationComponent.h"
 #include "SoundManager.h"
+#include "SpriteComponent.h"
 #include "SystemManager.h"
 
 namespace ECSEngine {
@@ -107,8 +108,8 @@ private:
         inputComp.dashLockout = kDashDelay;
     }
 
-    void attempDash(EngineView<Components...>* engine, InputManager& im, InputComponent& inputComp, MovementComponent& movementComp,
-                    GravityComponent& gravityComp) {
+    void attempDash(EngineView<Components...>* engine, InputManager& im, InputComponent& inputComp,
+                    MovementComponent& movementComp, GravityComponent& gravityComp) {
         if (inputComp.dashesLeft > 0 && inputComp.dashLockout == 0) {
             if (im.KeyIsDown(Key::D) && !im.KeyIsDown(Key::A)) {
                 movementComp.velocity.x = kDashVelocity;
@@ -126,8 +127,9 @@ private:
         }
     }
 
-    void handleJumpingAndDashing(EngineView<Components...>* engine, InputManager& im, InputComponent& inputComp,
-                                 MovementComponent& movementComp, GravityComponent& gravityComp) {
+    void handleJumpingAndDashing(EngineView<Components...>* engine, InputManager& im,
+                                 InputComponent& inputComp, MovementComponent& movementComp,
+                                 GravityComponent& gravityComp) {
         if (inputComp.jumpBufferTime > 0) {
             // veritcal jump
             if (inputComp.timeSinceGround < kCoyoteTime) {
@@ -181,8 +183,41 @@ private:
         }
     }
 
-    // void A(InputManager& im, InputComponent& inputComp, MovementComponent& movementComp,
-    //        CollisionComponent& collisionComp) {}
+    void handleAnimation(InputComponent& inputComp, MovementComponent& movementComp,
+                         CollisionComponent& collisionComp, SpriteComponent& spriteComp) {
+        if (std::abs(movementComp.velocity.x) > 30) {
+            spriteComp.flip = movementComp.velocity.x < 0;
+        }
+
+        if (collisionComp.onGround) {
+            if (std::abs(movementComp.velocity.x) < 30) {
+                spriteComp.spriteID = inputComp.idleSprite;
+                inputComp.walkCycle = 0;
+            } else {
+                inputComp.walkCycle += 0.01 + std::abs(movementComp.velocity.x) / 6000;
+                if (inputComp.walkCycle > 1) {
+                    inputComp.walkCycle -= 1;
+                }
+
+                if (inputComp.walkCycle < 0.5) {
+                    spriteComp.spriteID = inputComp.walk1Sprite;
+                } else {
+                    spriteComp.spriteID = inputComp.walk2Sprite;
+                }
+            }
+        } else {
+            inputComp.walkCycle = 0;
+            if (inputComp.dashLockout > 0) {
+                spriteComp.spriteID = inputComp.dashSprite;
+            } else {
+                if (movementComp.velocity.y < 0) {
+                    spriteComp.spriteID = inputComp.jumpSprite;
+                } else {
+                    spriteComp.spriteID = inputComp.fallSprite;
+                }
+            }
+        }
+    }
 
 public:
     const std::string& GetName() const override {
@@ -201,19 +236,22 @@ public:
 
             if (entity.template HasComponent<MovementComponent>() &&
                 entity.template HasComponent<CollisionComponent>() &&
-                entity.template HasComponent<GravityComponent>()) {
+                entity.template HasComponent<GravityComponent>() &&
+                entity.template HasComponent<SpriteComponent>()) {
                 InputComponent& inputComp = inputPair.second;
                 MovementComponent& movementComp =
                     em.template GetComponent<MovementComponent>(entity);
                 CollisionComponent& collisionComp =
                     em.template GetComponent<CollisionComponent>(entity);
                 GravityComponent& gravityComp = em.template GetComponent<GravityComponent>(entity);
+                SpriteComponent& spriteComp = em.template GetComponent<SpriteComponent>(entity);
 
                 handleRunning(im, movementComp, collisionComp);
                 handleCoyoteAndBuffering(im, inputComp, collisionComp);
                 handleJumpingAndDashing(engine, im, inputComp, movementComp, gravityComp);
                 handleWallSliding(im, movementComp, collisionComp);
                 handleFriction(movementComp, collisionComp);
+                handleAnimation(inputComp, movementComp, collisionComp, spriteComp);
             }
         }
 

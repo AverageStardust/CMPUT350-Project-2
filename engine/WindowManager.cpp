@@ -47,13 +47,18 @@ void WindowManager::DebugFrameRect(const Rect& rect, int red, int green, int blu
     mWindow->draw(sfRect);
 }
 
-void WindowManager::DrawSpriteWorld(sf::Sprite& sprite, Point2D position) {
-    DrawSpriteWindow(sprite, WorldToWindow(position));
+void WindowManager::DrawSpriteWorld(sf::Sprite& sprite, Point2D position, bool flip) {
+    DrawSpriteWindow(sprite, WorldToWindow(position), flip);
 }
 
-void WindowManager::DrawSpriteWindow(sf::Sprite& sprite, Point2D position) {
-    sprite.setPosition(position.Round().AsSfmlVectorF());
-    sprite.setScale({1.0f / mWorldUnitsPerPixel, 1.0f / mWorldUnitsPerPixel});
+void WindowManager::DrawSpriteWindow(sf::Sprite& sprite, Point2D position, bool flip) {
+    if (flip) {
+        sprite.setPosition((position + Point2D{sprite.getLocalBounds().size.x, 0}).Round().AsSfmlVectorF());
+        sprite.setScale({-1.0f / mWorldUnitsPerPixel, 1.0f / mWorldUnitsPerPixel});
+    } else {
+        sprite.setPosition(position.Round().AsSfmlVectorF());
+        sprite.setScale({1.0f / mWorldUnitsPerPixel, 1.0f / mWorldUnitsPerPixel});
+    }
 
     mWindow->draw(sprite);
 }

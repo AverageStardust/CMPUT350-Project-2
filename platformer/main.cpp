@@ -34,24 +34,31 @@ int main(int argc, char* argv[]) {
     ECSEngine::Point2D playerStartPos = ECSEngine::Point2D(832, 512);
     em.AddComponent(player, ECSEngine::LocationComponent{.loc = playerStartPos});
     em.AddComponent(player, ECSEngine::MovementComponent{.velocity = ECSEngine::Point2D(0, 0)});
-    em.AddComponent(player, ECSEngine::GravityComponent{.acceleration = ECSEngine::Point2D(0, 700)});
+    em.AddComponent(player,
+                    ECSEngine::GravityComponent{.acceleration = ECSEngine::Point2D(0, 700)});
     em.AddComponent(player, ECSEngine::RespawnComponent{.loc = playerStartPos});
 
-    em.AddComponent(player, ECSEngine::InputComponent());
+    std::string characterSheet = resourcePath("spritesheet-characters-default.png");
+    ECSEngine::SpriteID idleSprite = sp.RegisterSprite(characterSheet, {128, 768, 128, 128});
+    ECSEngine::SpriteID walk1Sprite = sp.RegisterSprite(characterSheet, {128, 128, 128, 128});
+    ECSEngine::SpriteID walk2Sprite = sp.RegisterSprite(characterSheet, {128, 256, 128, 128});
+    ECSEngine::SpriteID jumpSprite = sp.RegisterSprite(characterSheet, {128, 384, 128, 128});
+    ECSEngine::SpriteID fallSprite = sp.RegisterSprite(characterSheet, {128, 640, 128, 128});
+    ECSEngine::SpriteID dashSprite = sp.RegisterSprite(characterSheet, {128, 896, 128, 128});
+
+    em.AddComponent(player, ECSEngine::InputComponent(idleSprite, walk1Sprite, walk2Sprite,
+                                                      jumpSprite, fallSprite, dashSprite, 1));
     em.AddComponent(
         player, ECSEngine::CollisionComponent{.localBounds = ECSEngine::Rect(-22, -70, 44, 70)});
 
-    ECSEngine::SpriteID playerSprite = sp.RegisterSprite(
-        resourcePath("spritesheet-characters-default.png"), {1 * 128, 6 * 128, 128, 128});
-    em.AddComponent(player,
-                    ECSEngine::SpriteComponent{
-                        .spriteID = playerSprite, .offset = {-64, -128}, .worldSpace = true});
+    em.AddComponent(player, ECSEngine::SpriteComponent{
+                                .spriteID = idleSprite, .offset = {-64, -128}, .worldSpace = true});
 
     // Setup score component
     ECSEngine::ScoreComponent scoreComp = {};
     for (int i = 0; i < 10; i++) {
         scoreComp.digitSpriteID[i] = sp.RegisterSprite(
-            resourcePath("spritesheet-tiles-default.png"), {13 * 64, float(13 - i) * 64, 64, 64});
+            resourcePath("spritesheet-tiles-default.png"), {832, float(13 - i) * 64, 64, 64});
     }
 
     ECSEngine::EntityID score = em.CreateEntity();

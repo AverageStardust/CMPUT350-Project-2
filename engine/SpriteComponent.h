@@ -14,6 +14,7 @@ public:
     SpriteID spriteID;
     Point2D offset = {};
     bool worldSpace;  // If false, this sprite is drawn in screen space instead of world space
+    bool flip = false;
 private:
 };
 

@@ -41,9 +41,9 @@ public:
 
             sf::Sprite sprite = sm.GetSprite(spriteComp.spriteID);
             if (spriteComp.worldSpace) {
-                wm.DrawSpriteWorld(sprite, location + spriteComp.offset);
+                wm.DrawSpriteWorld(sprite, location + spriteComp.offset, spriteComp.flip);
             } else {
-                wm.DrawSpriteWindow(sprite, location + spriteComp.offset);
+                wm.DrawSpriteWindow(sprite, location + spriteComp.offset, spriteComp.flip);
             }
         }
 

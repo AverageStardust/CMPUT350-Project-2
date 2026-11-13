@@ -4,6 +4,7 @@
 
 #include <limits>
 
+#include "SpriteManager.h"
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -11,8 +12,24 @@
 namespace ECSEngine {
 
 struct InputComponent {
-    InputComponent(uint maxDashes = 1) : maxDashes(maxDashes) {}
-    uint maxDashes;
+    InputComponent() {}
+    InputComponent(SpriteID idleSprite, SpriteID walk1Sprite, SpriteID walk2Sprite,
+                   SpriteID jumpSprite, SpriteID fallSprite, SpriteID dashSprite, uint maxDashes)
+        : idleSprite(idleSprite),
+          walk1Sprite(walk1Sprite),
+          walk2Sprite(walk2Sprite),
+          jumpSprite(jumpSprite),
+          fallSprite(fallSprite),
+          dashSprite(dashSprite),
+          maxDashes(maxDashes) {}
+    SpriteID idleSprite;
+    SpriteID walk1Sprite;
+    SpriteID walk2Sprite;
+    SpriteID jumpSprite;
+    SpriteID fallSprite;
+    SpriteID dashSprite;
+    float walkCycle = 0;
+    uint maxDashes = 1;
     uint dashesLeft = 0;
     uint dashLockout = 0;
     uint jumpTime = 0;
