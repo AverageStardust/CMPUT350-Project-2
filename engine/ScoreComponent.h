@@ -14,7 +14,7 @@ public:
     Point2D offset = {8, 8};
     float spacing = 38;
     SpriteID digitSpriteID[10];
-    EntityID digitID[3] = {NullEntity, NullEntity, NullEntity};
+    EntityID digitID[5] = {};
 
 private:
 };

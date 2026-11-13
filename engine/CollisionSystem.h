@@ -116,7 +116,7 @@ public:
 
                             auto& scoreStore = em.template GetComponentStorage<ScoreComponent>();
                             for (auto& scorePair : scoreStore) {
-                                scorePair.second.score += 6;
+                                scorePair.second.score += 67;
                             }
                         }
                     }
