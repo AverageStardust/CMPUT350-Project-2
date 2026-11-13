@@ -69,47 +69,50 @@ public:
             entity.template HasComponent<MovementComponent>()) {
             Rect overlap = otherComp.worldBounds & entityComp.worldBounds;
 
-            LocationComponent& location = em.template GetComponent<LocationComponent>(entity);
-            MovementComponent& movement = em.template GetComponent<MovementComponent>(entity);
+            // avoid clipping the corners of tiles
+            if (overlap.Area() > 4) {
+                LocationComponent& location = em.template GetComponent<LocationComponent>(entity);
+                MovementComponent& movement = em.template GetComponent<MovementComponent>(entity);
 
-            Point2D changeInVelocity = otherComp.lastVelocity - entityComp.lastVelocity;
-            if (entityComp.isCollectable &&
-                !otherComp.isCollectable) {  // remove !otherComp.isCollectable for fun times
-                changeInVelocity += entityComp.lastVelocity * -0.7f * massRatio;
-            }
-
-            if (entity.template HasComponent<InputComponent>()) {
-                InputComponent& input = em.template GetComponent<InputComponent>(entity);
-                applyScreenShake(engine, input, overlap, changeInVelocity, massRatio);
-            }
-
-            if (overlap.Width() < overlap.Height()) {
-                if (entityComp.worldBounds.Center().x > otherComp.worldBounds.Center().x) {
-                    location.loc.x =
-                        otherComp.worldBounds.bottomRight.x - entityComp.localBounds.topLeft.x;
-                    movement.velocity.x =
-                        entityComp.lastVelocity.x + changeInVelocity.x * massRatio;
-                    entityComp.onLeftWall = true;
-                } else {
-                    location.loc.x =
-                        otherComp.worldBounds.topLeft.x - entityComp.localBounds.bottomRight.x;
-                    movement.velocity.x =
-                        entityComp.lastVelocity.x + changeInVelocity.x * massRatio;
-                    entityComp.onRightWall = true;
+                Point2D changeInVelocity = otherComp.lastVelocity - entityComp.lastVelocity;
+                if (entityComp.isCollectable &&
+                    !otherComp.isCollectable) {  // remove !otherComp.isCollectable for fun times
+                    changeInVelocity += entityComp.lastVelocity * -0.7f * massRatio;
                 }
-            } else {
-                if (entityComp.worldBounds.Center().y > otherComp.worldBounds.Center().y) {
-                    location.loc.y =
-                        otherComp.worldBounds.bottomRight.y - entityComp.localBounds.topLeft.y;
-                    movement.velocity.y =
-                        entityComp.lastVelocity.y + changeInVelocity.y * massRatio;
-                    entityComp.onCeiling = true;
+
+                if (entity.template HasComponent<InputComponent>()) {
+                    InputComponent& input = em.template GetComponent<InputComponent>(entity);
+                    applyScreenShake(engine, input, overlap, changeInVelocity, massRatio);
+                }
+
+                if (overlap.Width() < overlap.Height()) {
+                    if (entityComp.worldBounds.Center().x > otherComp.worldBounds.Center().x) {
+                        location.loc.x =
+                            otherComp.worldBounds.bottomRight.x - entityComp.localBounds.topLeft.x;
+                        movement.velocity.x =
+                            entityComp.lastVelocity.x + changeInVelocity.x * massRatio;
+                        entityComp.onLeftWall = true;
+                    } else {
+                        location.loc.x =
+                            otherComp.worldBounds.topLeft.x - entityComp.localBounds.bottomRight.x;
+                        movement.velocity.x =
+                            entityComp.lastVelocity.x + changeInVelocity.x * massRatio;
+                        entityComp.onRightWall = true;
+                    }
                 } else {
-                    location.loc.y =
-                        otherComp.worldBounds.topLeft.y - entityComp.localBounds.bottomRight.y;
-                    movement.velocity.y =
-                        entityComp.lastVelocity.y + changeInVelocity.y * massRatio;
-                    entityComp.onGround = true;
+                    if (entityComp.worldBounds.Center().y > otherComp.worldBounds.Center().y) {
+                        location.loc.y =
+                            otherComp.worldBounds.bottomRight.y - entityComp.localBounds.topLeft.y;
+                        movement.velocity.y =
+                            entityComp.lastVelocity.y + changeInVelocity.y * massRatio;
+                        entityComp.onCeiling = true;
+                    } else {
+                        location.loc.y =
+                            otherComp.worldBounds.topLeft.y - entityComp.localBounds.bottomRight.y;
+                        movement.velocity.y =
+                            entityComp.lastVelocity.y + changeInVelocity.y * massRatio;
+                        entityComp.onGround = true;
+                    }
                 }
             }
         }
