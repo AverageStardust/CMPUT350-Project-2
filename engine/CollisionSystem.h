@@ -4,10 +4,10 @@
 
 #include "CollisionComponent.h"
 #include "EntityManager.h"
-#include "LocationComponent.h"
 #include "InputComponent.h"
-#include "ScoreComponent.h"
+#include "LocationComponent.h"
 #include "MathUtil.h"
+#include "ScoreComponent.h"
 #include "SystemManager.h"
 
 namespace ECSEngine {
@@ -47,28 +47,34 @@ public:
             if (overlap.Area() > 1) {
                 LocationComponent& location = em.template GetComponent<LocationComponent>(entity);
                 MovementComponent& movement = em.template GetComponent<MovementComponent>(entity);
+
+                Point2D changeInVelocity = otherComp.lastVelocity - movement.velocity;
+                if (entityComp.isCollectable) {
+                    changeInVelocity += movement.velocity * -0.4f * massRatio;
+                }
+
                 if (overlap.Width() < overlap.Height()) {
                     if (entityComp.worldBounds.Center().x > otherComp.worldBounds.Center().x) {
                         location.loc.x += overlap.Width() * massRatio;
-                        movement.velocity.x +=
-                            (otherComp.lastVelocity.x - movement.velocity.x) * massRatio;
+                        if (movement.velocity.x < otherComp.lastVelocity.x)
+                            movement.velocity.x += changeInVelocity.x * massRatio;
                         entityComp.onLeftWall = true;
                     } else {
                         location.loc.x -= overlap.Width() * massRatio;
-                        movement.velocity.x +=
-                            (otherComp.lastVelocity.x - movement.velocity.x) * massRatio;
+                        if (movement.velocity.x > otherComp.lastVelocity.x)
+                            movement.velocity.x += changeInVelocity.x * massRatio;
                         entityComp.onRightWall = true;
                     }
                 } else {
                     if (entityComp.worldBounds.Center().y > otherComp.worldBounds.Center().y) {
                         location.loc.y += overlap.Height() * massRatio;
-                        movement.velocity.y +=
-                            (otherComp.lastVelocity.y - movement.velocity.y) * massRatio;
+                        if (movement.velocity.y < otherComp.lastVelocity.y)
+                            movement.velocity.y += changeInVelocity.y * massRatio;
                         entityComp.onCeiling = true;
                     } else {
                         location.loc.y -= overlap.Height() * massRatio;
-                        movement.velocity.y +=
-                            (otherComp.lastVelocity.y - movement.velocity.y) * massRatio;
+                        if (movement.velocity.y > otherComp.lastVelocity.y)
+                            movement.velocity.y += changeInVelocity.y * massRatio;
                         entityComp.onGround = true;
                     }
                 }
@@ -104,7 +110,8 @@ public:
                         if (otherComp.doesDamage) applyDamage(em, dynamicEntity);
 
                         // Handle collectables
-                        if (dynamicEntity.template HasComponent<InputComponent>() && otherComp.isCollectable) {
+                        if (dynamicEntity.template HasComponent<InputComponent>() &&
+                            otherComp.isCollectable) {
                             em.RemoveEntity(otherPair.first);
 
                             auto& scoreStore = em.template GetComponentStorage<ScoreComponent>();
