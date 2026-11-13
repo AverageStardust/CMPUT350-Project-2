@@ -29,8 +29,8 @@ public:
     }
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
-        // InputManager& im = engine->GetInputManager();
-        // SoundManager& sm = engine->GetSoundManager();
+        InputManager& im = engine->GetInputManager();
+        SoundManager& sm = engine->GetSoundManager();
         EntityManager<Components...>& em = engine->GetEntityManager();
         auto& inputStore = em.template GetComponentStorage<InputComponent>();
 
@@ -39,9 +39,9 @@ public:
             if (entity.template HasComponent<MovementComponent>() &&
                 entity.template HasComponent<CollisionComponent>()) {
 
-                // InputComponent& inputComp = inputPair.second;
+                InputComponent& inputComp = inputPair.second;
                 MovementComponent& movementComp = em.template GetComponent<MovementComponent>(entity);
-                // CollisionComponent& collisionComp = em.template GetComponent<CollisionComponent>(entity);
+                CollisionComponent& collisionComp = em.template GetComponent<CollisionComponent>(entity);
 
                 // Deal with dashing before standard x movement (normal movement limits velocity)
 
