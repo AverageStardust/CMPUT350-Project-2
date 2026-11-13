@@ -6,6 +6,7 @@
 #include "CameraSystem.h"
 #include "CollisionComponent.h"
 #include "EntityManager.h"
+#include "SoundManager.h"
 #include "InputComponent.h"
 #include "LocationComponent.h"
 #include "MathUtil.h"
@@ -98,6 +99,18 @@ public:
                     movement.velocity.y =
                         entityComp.lastVelocity.y + changeInVelocity.y * massRatio;
                     entityComp.onGround = true;
+
+                    // Play land sound effect
+                    if (entity.template HasComponent<InputComponent>()) {
+                        InputComponent& inputComp = em.template GetComponent<InputComponent>(entity);
+                        if (!inputComp.landSoundActive) {
+                            if (otherComp.isStatic) {
+                                SoundManager& som = engine->GetSoundManager();
+                                som.Play(inputComp.landSound);
+                            }
+                            inputComp.landSoundActive = true;
+                        }
+                    }
                 }
             }
         }
@@ -105,6 +118,7 @@ public:
 
     tSystemReturn Run(EngineView<Components...>* engine) override {
         EntityManager<Components...>& em = engine->GetEntityManager();
+        SoundManager& som = engine->GetSoundManager();
 
         auto& collisionStore = em.template GetComponentStorage<CollisionComponent>();
 
@@ -112,13 +126,17 @@ public:
             CollisionComponent& dynamicComp = dynamicPair.second;
 
             if (!dynamicComp.isStatic) {
+                Entity<Components...>& dynamicEntity = em.GetEntity(dynamicPair.first);
+
                 // reset flags
+                if (dynamicEntity.template HasComponent<InputComponent>() && !dynamicComp.onGround) {
+                    InputComponent& inputComp = em.template GetComponent<InputComponent>(dynamicEntity);
+                    inputComp.landSoundActive = false;
+                }
                 dynamicComp.onGround = false;
                 dynamicComp.onCeiling = false;
                 dynamicComp.onLeftWall = false;
                 dynamicComp.onRightWall = false;
-
-                Entity<Components...>& dynamicEntity = em.GetEntity(dynamicPair.first);
 
                 for (auto& otherPair : collisionStore) {
                     if (dynamicPair.first == otherPair.first) continue;
@@ -139,6 +157,9 @@ public:
                             for (auto& scorePair : scoreStore) {
                                 scorePair.second.score += 67;
                             }
+
+                            InputComponent& inputComp = em.template GetComponent<InputComponent>(dynamicEntity);
+                            som.Play(inputComp.collectSound);
                         }
                     }
                 }

@@ -15,12 +15,16 @@ int main(int argc, char* argv[]) {
     Engine engine(1024, 768, "Test Engine");
 
     // Load sounds
-    // auto& som = engine.GetSoundManager();
-    // ECSEngine::SoundID testSound = som.RegisterSound(resourcePath("sfx_gem.ogg"));
+    auto& som = engine.GetSoundManager();
+    ECSEngine::SoundID jumpSound = som.RegisterSound(resourcePath("sfx_jump.ogg"));
+    ECSEngine::SoundID landSound = som.RegisterSound(resourcePath("footstep_grass_003.ogg"));
+    ECSEngine::SoundID collectSound = som.RegisterSound(resourcePath("sfx_gem.ogg"));
+    ECSEngine::SoundID wallSound = som.RegisterSound(resourcePath("footstep_snow_001.ogg"));
 
     // Managers
     auto& em = engine.GetEntityManager();
     auto& sp = engine.GetSpriteManager();
+
 
     // Load maps
     ECSEngine::SpriteID spawnerSprite = sp.RegisterSprite(
@@ -38,6 +42,7 @@ int main(int argc, char* argv[]) {
                     ECSEngine::GravityComponent{.acceleration = ECSEngine::Point2D(0, 700)});
     em.AddComponent(player, ECSEngine::RespawnComponent{.loc = playerStartPos});
 
+    // Player sprites
     std::string characterSheet = resourcePath("spritesheet-characters-default.png");
     ECSEngine::SpriteID idleSprite = sp.RegisterSprite(characterSheet, {128, 768, 128, 128});
     ECSEngine::SpriteID walk1Sprite = sp.RegisterSprite(characterSheet, {128, 128, 128, 128});
@@ -47,7 +52,9 @@ int main(int argc, char* argv[]) {
     ECSEngine::SpriteID dashSprite = sp.RegisterSprite(characterSheet, {128, 896, 128, 128});
 
     em.AddComponent(player, ECSEngine::InputComponent(idleSprite, walk1Sprite, walk2Sprite,
-                                                      jumpSprite, fallSprite, dashSprite, 1));
+                                                      jumpSprite, fallSprite, dashSprite,
+                                                      jumpSound, landSound, collectSound, wallSound,
+                                                      1));
     em.AddComponent(
         player, ECSEngine::CollisionComponent{.localBounds = ECSEngine::Rect(-22, -70, 44, 70)});
 
