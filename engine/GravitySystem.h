@@ -30,7 +30,11 @@ public:
                 MovementComponent& movementComp =
                     em.template GetComponent<MovementComponent>(entity);
 
-                movementComp.velocity += gravityComp.acceleration / FRAMES_PER_SECOND;
+                if (gravityComp.disabledTime > 0) {
+                    gravityComp.disabledTime--;
+                } else {
+                    movementComp.velocity += gravityComp.acceleration / FRAMES_PER_SECOND;
+                }
             }
         }
 

@@ -15,6 +15,18 @@ namespace ECSEngine {
 template <typename... Components>
 class CameraSystem : public System<Components...> {
 public:
+    static void ApplyScreenShake(EngineView<Components...>* engine, Point2D shake) {
+        if (shake.Length() > 28) {
+            EntityManager<Components...>& em = engine->GetEntityManager();
+            auto& CameraShakeStore = em.template GetComponentStorage<CameraShake>();
+
+            for (auto& cameraShakePair : CameraShakeStore) {
+                cameraShakePair.second.direction = shake.Normalized();
+                cameraShakePair.second.frameTime = shake.Length() / 15;
+            }
+        }
+    }
+
     const std::string& GetName() const override {
         static std::string name = "CameraSystem";
         return name;
@@ -57,7 +69,7 @@ public:
                 if (shake.frameTime > 0) {
                     shake.frameTime--;
                     cameraPosition +=
-                        shake.direction * float((rand() % 256) - 128) * shake.frameTime / 2048;
+                        shake.direction * float((rand() % 256) - 128) * shake.frameTime / 1024;
                 }
             }
 

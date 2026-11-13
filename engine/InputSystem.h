@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "CameraSystem.h"
 #include "CollisionComponent.h"
 #include "EntityManager.h"
 #include "InputComponent.h"
@@ -20,14 +21,15 @@ const float kAirRunAcceleration = 10;
 const int kCoyoteTime = 9;
 const int kJumpBufferTime = 9;
 const int kVerticalJumpTime = 10;
-const int kWallJumpTime = 5;
+const int kWallJumpTime = 6;
 const float kJumpInitalAcceleration = 400;
 const float kJumpExtendedAcceleration = 55;
-const float kJumpWallVerticalAcceleration = 220;
+const float kJumpWallVerticalAcceleration = 320;
 const float kJumpWallHorizontalAcceleration = 200;
 
-const float kDashVelocity = 400;
-const float kDashInterval = 25;
+const float kDashVelocity = 500;
+const float kDashInterval = 22;
+const float kDashDelay = 30;
 
 const float kGroundFriction = 0.15;
 const float kAirDrag = 0.035;
@@ -36,7 +38,7 @@ const float kWallSlideFriction = 0.15;
 template <typename... Components>
 class InputSystem : public System<Components...> {
 private:
-    void HandleRunning(InputManager& im, MovementComponent& movementComp,
+    void handleRunning(InputManager& im, MovementComponent& movementComp,
                        CollisionComponent& collisionComp) {
         // ground and air running
         if (collisionComp.onGround) {
@@ -59,8 +61,8 @@ private:
         }
     }
 
-    void HandleJumpCoyoteAndBuffering(InputManager& im, InputComponent& inputComp,
-                                      CollisionComponent& collisionComp) {
+    void handleCoyoteAndBuffering(InputManager& im, InputComponent& inputComp,
+                                  CollisionComponent& collisionComp) {
         // jump buffering
         if (im.KeyJustPressed(Key::Space)) {
             inputComp.jumpBufferTime = kJumpBufferTime;
@@ -68,51 +70,85 @@ private:
             inputComp.jumpBufferTime--;
         }
 
+        // dash delay
+        if (inputComp.dashLockout > 0) {
+            inputComp.dashLockout--;
+        }
+
         // coyote time
         if (collisionComp.onGround) {
             inputComp.timeSinceGround = 0;
+            inputComp.dashesLeft = 1;  // restore dashes
         } else {
             inputComp.timeSinceGround++;
         }
         if (collisionComp.onLeftWall) {
             inputComp.timeSinceLeftWall = 0;
+            inputComp.dashesLeft = 1;  // restore dashes
         } else {
             inputComp.timeSinceLeftWall++;
         }
         if (collisionComp.onRightWall) {
             inputComp.timeSinceRightWall = 0;
+            inputComp.dashesLeft = 1;  // restore dashes
         } else {
             inputComp.timeSinceRightWall++;
         }
     }
 
-    void JumpForTime(InputComponent& inputComp, uint time) {
+    void lockJump(InputComponent& inputComp) {
         inputComp.timeSinceGround = kCoyoteTime;
         inputComp.jumpBufferTime = 0;
-        inputComp.jumpTime = time;
     }
 
-    void HandleJumping(InputManager& im, InputComponent& inputComp,
-                       MovementComponent& movementComp) {
+    void consumeDash(InputComponent& inputComp) {
+        lockJump(inputComp);
+        inputComp.dashesLeft--;
+        inputComp.dashLockout = kDashDelay;
+    }
+
+    void attempDash(EngineView<Components...>* engine, InputManager& im, InputComponent& inputComp, MovementComponent& movementComp,
+                    GravityComponent& gravityComp) {
+        if (inputComp.dashesLeft > 0 && inputComp.dashLockout == 0) {
+            if (im.KeyIsDown(Key::D) && !im.KeyIsDown(Key::A)) {
+                movementComp.velocity.x = kDashVelocity;
+                movementComp.velocity.y = 0;
+                gravityComp.disabledTime = kDashInterval;
+                consumeDash(inputComp);
+                CameraSystem<Components...>::ApplyScreenShake(engine, {kDashVelocity, 0});
+            } else if (im.KeyIsDown(Key::A) && !im.KeyIsDown(Key::D)) {
+                movementComp.velocity.x = -kDashVelocity;
+                movementComp.velocity.y = 0;
+                gravityComp.disabledTime = kDashInterval;
+                consumeDash(inputComp);
+                CameraSystem<Components...>::ApplyScreenShake(engine, {-kDashVelocity, 0});
+            }
+        }
+    }
+
+    void handleJumpingAndDashing(EngineView<Components...>* engine, InputManager& im, InputComponent& inputComp,
+                                 MovementComponent& movementComp, GravityComponent& gravityComp) {
         if (inputComp.jumpBufferTime > 0) {
             // veritcal jump
             if (inputComp.timeSinceGround < kCoyoteTime) {
-                JumpForTime(inputComp, kVerticalJumpTime);
+                lockJump(inputComp);
+                inputComp.jumpTime = kVerticalJumpTime;
                 movementComp.velocity.y = -kJumpInitalAcceleration;
-            } else if (inputComp.timeSinceLeftWall < inputComp.timeSinceRightWall) {
+            } else if (inputComp.timeSinceLeftWall < kCoyoteTime &&
+                       inputComp.timeSinceLeftWall < inputComp.timeSinceRightWall) {
                 // wall jump left
-                if (inputComp.timeSinceLeftWall < kCoyoteTime) {
-                    JumpForTime(inputComp, kVerticalJumpTime);
-                    movementComp.velocity.x = kJumpWallHorizontalAcceleration;
-                    movementComp.velocity.y = -kJumpWallVerticalAcceleration;
-                }
-            } else {
+                lockJump(inputComp);
+                inputComp.jumpTime = kWallJumpTime;
+                movementComp.velocity.x = kJumpWallHorizontalAcceleration;
+                movementComp.velocity.y = -kJumpWallVerticalAcceleration;
+            } else if (inputComp.timeSinceRightWall < kCoyoteTime) {
                 // wall jump right
-                if (inputComp.timeSinceRightWall < kCoyoteTime) {
-                    JumpForTime(inputComp, kVerticalJumpTime);
-                    movementComp.velocity.x = -kJumpWallHorizontalAcceleration;
-                    movementComp.velocity.y = -kJumpWallVerticalAcceleration;
-                }
+                lockJump(inputComp);
+                inputComp.jumpTime = kWallJumpTime;
+                movementComp.velocity.x = -kJumpWallHorizontalAcceleration;
+                movementComp.velocity.y = -kJumpWallVerticalAcceleration;
+            } else {
+                attempDash(engine, im, inputComp, movementComp, gravityComp);
             }
         } else if (inputComp.jumpTime > 0) {
             // extended jump
@@ -123,7 +159,7 @@ private:
         }
     }
 
-    void HandleWallSliding(InputManager& im, MovementComponent& movementComp,
+    void handleWallSliding(InputManager& im, MovementComponent& movementComp,
                            CollisionComponent& collisionComp) {
         // wall slide
         if (((im.KeyIsDown(Key::D) && collisionComp.onRightWall) ||
@@ -133,7 +169,7 @@ private:
         }
     }
 
-    void HandleFriction(MovementComponent& movementComp, CollisionComponent& collisionComp) {
+    void handleFriction(MovementComponent& movementComp, CollisionComponent& collisionComp) {
         // drag / friction
         if (collisionComp.onGround) {
             movementComp.velocity.x *= 1.0f - kGroundFriction;
@@ -164,18 +200,20 @@ public:
             Entity<Components...>& entity = em.GetEntity(inputPair.first);
 
             if (entity.template HasComponent<MovementComponent>() &&
-                entity.template HasComponent<CollisionComponent>()) {
+                entity.template HasComponent<CollisionComponent>() &&
+                entity.template HasComponent<GravityComponent>()) {
                 InputComponent& inputComp = inputPair.second;
                 MovementComponent& movementComp =
                     em.template GetComponent<MovementComponent>(entity);
                 CollisionComponent& collisionComp =
                     em.template GetComponent<CollisionComponent>(entity);
+                GravityComponent& gravityComp = em.template GetComponent<GravityComponent>(entity);
 
-                HandleRunning(im, movementComp, collisionComp);
-                HandleJumpCoyoteAndBuffering(im, inputComp, collisionComp);
-                HandleJumping(im, inputComp, movementComp);
-                HandleWallSliding(im, movementComp, collisionComp);
-                HandleFriction(movementComp, collisionComp);
+                handleRunning(im, movementComp, collisionComp);
+                handleCoyoteAndBuffering(im, inputComp, collisionComp);
+                handleJumpingAndDashing(engine, im, inputComp, movementComp, gravityComp);
+                handleWallSliding(im, movementComp, collisionComp);
+                handleFriction(movementComp, collisionComp);
             }
         }
 

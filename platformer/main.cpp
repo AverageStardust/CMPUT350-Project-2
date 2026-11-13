@@ -34,8 +34,7 @@ int main(int argc, char* argv[]) {
     ECSEngine::Point2D playerStartPos = ECSEngine::Point2D(832, 512);
     em.AddComponent(player, ECSEngine::LocationComponent{.loc = playerStartPos});
     em.AddComponent(player, ECSEngine::MovementComponent{.velocity = ECSEngine::Point2D(0, 0)});
-    em.AddComponent(player, ECSEngine::GravityComponent{.acceleration = ECSEngine::Point2D(0, 700),
-                                                        .disabledTimer = 0});
+    em.AddComponent(player, ECSEngine::GravityComponent{.acceleration = ECSEngine::Point2D(0, 700)});
     em.AddComponent(player, ECSEngine::RespawnComponent{.loc = playerStartPos});
 
     em.AddComponent(player, ECSEngine::InputComponent());

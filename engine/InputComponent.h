@@ -11,8 +11,10 @@
 namespace ECSEngine {
 
 struct InputComponent {
-    InputComponent() : dashesLeft(0) {}
-    uint dashesLeft;
+    InputComponent(uint maxDashes = 1) : maxDashes(maxDashes) {}
+    uint maxDashes;
+    uint dashesLeft = 0;
+    uint dashLockout = 0;
     uint jumpTime = 0;
     uint jumpBufferTime = 0;
     uint timeSinceGround = std::numeric_limits<uint>::max() / 2;

@@ -3,6 +3,7 @@
 #include <string>
 
 #include "CameraComponent.h"
+#include "CameraSystem.h"
 #include "CollisionComponent.h"
 #include "EntityManager.h"
 #include "InputComponent.h"
@@ -30,7 +31,7 @@ public:
         }
     }
 
-    void applyScreenShake(EntityManager<Components...>& em, const Rect& overlap,
+    void applyScreenShake(EngineView<Components...>* engine, const Rect& overlap,
                           const Point2D& changeInVelocity) {
         Point2D shake;
         if (overlap.Width() < overlap.Height()) {
@@ -39,16 +40,10 @@ public:
             shake = Point2D{0, changeInVelocity.y};
         }
 
-        if (shake.Length() > 25) {
-            auto& CameraShakeStore = em.template GetComponentStorage<CameraShake>();
-            for (auto& cameraShakePair : CameraShakeStore) {
-                cameraShakePair.second.direction = shake.Normalized();
-                cameraShakePair.second.frameTime = shake.Length() / 8;
-            }
-        }
+        CameraSystem<Components...>::ApplyScreenShake(engine, shake);
     }
 
-    void resolveCollision(EntityManager<Components...>& em, CollisionComponent& otherComp,
+    void resolveCollision(EngineView<Components...>* engine, EntityManager<Components...>& em, CollisionComponent& otherComp,
                           CollisionComponent& entityComp, Entity<Components...>& entity) {
         bool massRatio = 1;
 
@@ -73,7 +68,7 @@ public:
             }
 
             if (entity.template HasComponent<InputComponent>()) {
-                applyScreenShake(em, overlap, changeInVelocity * massRatio);
+                applyScreenShake(engine, overlap, changeInVelocity * massRatio);
             }
 
             if (overlap.Width() < overlap.Height()) {
@@ -131,7 +126,7 @@ public:
                     CollisionComponent& otherComp = otherPair.second;
 
                     if (dynamicComp.worldBounds.IsOverlapping(otherComp.worldBounds)) {
-                        resolveCollision(em, otherComp, dynamicComp, dynamicEntity);
+                        resolveCollision(engine, em, otherComp, dynamicComp, dynamicEntity);
 
                         if (otherComp.doesDamage) applyDamage(em, dynamicEntity);
 
