@@ -13,8 +13,6 @@
 
 namespace ECSEngine {
 
-const float kEpsilon = 0.1;
-
 template <typename... Components>
 class CollisionSystem : public System<Components...> {
 public:
@@ -45,7 +43,7 @@ public:
             auto& CameraShakeStore = em.template GetComponentStorage<CameraShake>();
             for (auto& cameraShakePair : CameraShakeStore) {
                 cameraShakePair.second.direction = shake.Normalized();
-                cameraShakePair.second.frameTime = shake.Length() / 10;
+                cameraShakePair.second.frameTime = shake.Length() / 8;
             }
         }
     }
@@ -65,44 +63,46 @@ public:
             entity.template HasComponent<MovementComponent>()) {
             Rect overlap = otherComp.worldBounds & entityComp.worldBounds;
 
-            if (overlap.Area() > 1) {
-                LocationComponent& location = em.template GetComponent<LocationComponent>(entity);
-                MovementComponent& movement = em.template GetComponent<MovementComponent>(entity);
+            LocationComponent& location = em.template GetComponent<LocationComponent>(entity);
+            MovementComponent& movement = em.template GetComponent<MovementComponent>(entity);
 
-                Point2D changeInVelocity = otherComp.lastVelocity - movement.velocity;
-                if (entityComp.isCollectable &&
-                    !otherComp.isCollectable) {  // remove !otherComp.isCollectable for fun times
-                    changeInVelocity += entityComp.lastVelocity * -0.7f * massRatio;
-                }
+            Point2D changeInVelocity = otherComp.lastVelocity - entityComp.lastVelocity;
+            if (entityComp.isCollectable &&
+                !otherComp.isCollectable) {  // remove !otherComp.isCollectable for fun times
+                changeInVelocity += entityComp.lastVelocity * -0.7f * massRatio;
+            }
 
-                if (entity.template HasComponent<InputComponent>()) {
-                    applyScreenShake(em, overlap, changeInVelocity * massRatio);
-                }
+            if (entity.template HasComponent<InputComponent>()) {
+                applyScreenShake(em, overlap, changeInVelocity * massRatio);
+            }
 
-                if (overlap.Width() < overlap.Height()) {
-                    if (entityComp.worldBounds.Center().x > otherComp.worldBounds.Center().x) {
-                        location.loc.x += std::max(0.0f, overlap.Width() * massRatio - kEpsilon);
-                        if (movement.velocity.x < otherComp.lastVelocity.x)
-                            movement.velocity.x += changeInVelocity.x * massRatio;
-                        entityComp.onLeftWall = true;
-                    } else {
-                        location.loc.x -= std::max(0.0f, overlap.Width() * massRatio - kEpsilon);
-                        if (movement.velocity.x > otherComp.lastVelocity.x)
-                            movement.velocity.x += changeInVelocity.x * massRatio;
-                        entityComp.onRightWall = true;
-                    }
+            if (overlap.Width() < overlap.Height()) {
+                if (entityComp.worldBounds.Center().x > otherComp.worldBounds.Center().x) {
+                    location.loc.x =
+                        otherComp.worldBounds.bottomRight.x - entityComp.localBounds.topLeft.x;
+                    movement.velocity.x =
+                        entityComp.lastVelocity.x + changeInVelocity.x * massRatio;
+                    entityComp.onLeftWall = true;
                 } else {
-                    if (entityComp.worldBounds.Center().y > otherComp.worldBounds.Center().y) {
-                        location.loc.y += std::max(0.0f, overlap.Height() * massRatio - kEpsilon);
-                        if (movement.velocity.y < otherComp.lastVelocity.y)
-                            movement.velocity.y += changeInVelocity.y * massRatio;
-                        entityComp.onCeiling = true;
-                    } else {
-                        location.loc.y -= std::max(0.0f, overlap.Height() * massRatio - kEpsilon);
-                        if (movement.velocity.y > otherComp.lastVelocity.y)
-                            movement.velocity.y += changeInVelocity.y * massRatio;
-                        entityComp.onGround = true;
-                    }
+                    location.loc.x =
+                        otherComp.worldBounds.topLeft.x - entityComp.localBounds.bottomRight.x;
+                    movement.velocity.x =
+                        entityComp.lastVelocity.x + changeInVelocity.x * massRatio;
+                    entityComp.onRightWall = true;
+                }
+            } else {
+                if (entityComp.worldBounds.Center().y > otherComp.worldBounds.Center().y) {
+                    location.loc.y =
+                        otherComp.worldBounds.bottomRight.y - entityComp.localBounds.topLeft.y;
+                    movement.velocity.y =
+                        entityComp.lastVelocity.y + changeInVelocity.y * massRatio;
+                    entityComp.onCeiling = true;
+                } else {
+                    location.loc.y =
+                        otherComp.worldBounds.topLeft.y - entityComp.localBounds.bottomRight.y;
+                    movement.velocity.y =
+                        entityComp.lastVelocity.y + changeInVelocity.y * massRatio;
+                    entityComp.onGround = true;
                 }
             }
         }

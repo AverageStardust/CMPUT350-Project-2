@@ -25,18 +25,12 @@ public:
         for (auto& gravityPair : gravityStore) {
             Entity<Components...>& entity = em.GetEntity(gravityPair.first);
 
-            if (entity.template HasComponent<MovementComponent>() &&
-                entity.template HasComponent<CollisionComponent>()) {
-
+            if (entity.template HasComponent<MovementComponent>()) {
                 GravityComponent& gravityComp = gravityPair.second;
                 MovementComponent& movementComp =
                     em.template GetComponent<MovementComponent>(entity);
-                CollisionComponent& collisionComp =
-                    em.template GetComponent<CollisionComponent>(entity);
 
-                if (!collisionComp.onGround) {
-                    movementComp.velocity += gravityComp.acceleration / FRAMES_PER_SECOND;
-                }
+                movementComp.velocity += gravityComp.acceleration / FRAMES_PER_SECOND;
             }
         }
 

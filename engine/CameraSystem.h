@@ -57,7 +57,7 @@ public:
                 if (shake.frameTime > 0) {
                     shake.frameTime--;
                     cameraPosition +=
-                        shake.direction * float((rand() % 256) - 128) * shake.frameTime / 1024;
+                        shake.direction * float((rand() % 256) - 128) * shake.frameTime / 2048;
                 }
             }
 

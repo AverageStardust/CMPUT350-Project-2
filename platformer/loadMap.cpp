@@ -137,8 +137,8 @@ void AddTile(Engine& engine, TileType& type, ECSEngine::Point2D position,
             entity, ECSEngine::SpawnComponent{.spawnSpriteID = spawnSprite,
                                               .spawnSize = spawnSize,
                                               .timeToNextSpawn = ECSEngine::FRAMES_PER_SECOND * 3,
-                                              .timeBetweenSpawns = int(ECSEngine::FRAMES_PER_SECOND * 1.2),
-                                              .totalSpawns = 30});
+                                              .timeBetweenSpawns = int(ECSEngine::FRAMES_PER_SECOND * 1.5),
+                                              .totalSpawns = 25});
     }
 }
 
