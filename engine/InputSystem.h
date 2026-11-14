@@ -21,15 +21,15 @@ const float kAirRunAcceleration = 10;
 
 const int kCoyoteTime = 9;
 const int kJumpBufferTime = 9;
-const int kVerticalJumpTime = 7;
-const int kWallJumpTime = 4;
-const float kJumpInitalAcceleration = 400;
-const float kJumpExtendedAcceleration = 75;
-const float kJumpWallVerticalAcceleration = 320;
-const float kJumpWallHorizontalAcceleration = 200;
+const int kVerticalJumpTime = 17;
+const int kWallJumpTime = 12;
+const float kJumpInitalAcceleration = 350;
+const float kJumpExtendedAcceleration = 60;
+const float kJumpWallVerticalAcceleration = 250;
+const float kJumpWallHorizontalAcceleration = 220;
 
 const float kDashVelocity = 500;
-const float kDashInterval = 22;
+const float kDashInterval = 25;
 const float kDashDelay = 30;
 
 const float kGroundFriction = 0.15;
@@ -206,8 +206,8 @@ private:
             movementComp.velocity.x *= 1.0f - kGroundFriction;
         } else {
             movementComp.velocity.x *= 1.0f - kAirDrag;
-            if (movementComp.velocity.y < 0 || movementComp.velocity.y > kMaxRunVelocity) {
-                movementComp.velocity.y *= 1.0f - kAirDrag;
+            if (movementComp.velocity.y < 0) { // only vertical drag going up
+                movementComp.velocity.y *= 1.0f - kAirDrag * 2;
             }
         }
     }
