@@ -36,6 +36,13 @@ const float kGroundFriction = 0.15;
 const float kAirDrag = 0.035;
 const float kWallSlideFriction = 0.15;
 
+const int kLeftKey = Key::Left;
+const int kRightKey = Key::Right;
+const int kDownKey = Key::Down;
+const int kUpKey = Key::Up;
+const int kJumpKey = Key::Z;
+const int kDashKey = Key::C;
+
 template <typename... Components>
 class InputSystem : public System<Components...> {
 private:
@@ -43,20 +50,20 @@ private:
                        CollisionComponent& collisionComp) {
         // ground and air running
         if (collisionComp.onGround) {
-            if (im.KeyIsDown(Key::D) && movementComp.velocity.x < kMaxRunVelocity) {
+            if (im.KeyIsDown(kRightKey) && movementComp.velocity.x < kMaxRunVelocity) {
                 movementComp.velocity.x += kGroundRunAcceleration;
             }
-            if (im.KeyIsDown(Key::A) && movementComp.velocity.x > -kMaxRunVelocity) {
+            if (im.KeyIsDown(kLeftKey) && movementComp.velocity.x > -kMaxRunVelocity) {
                 movementComp.velocity.x -= kGroundRunAcceleration;
             }
         } else {
-            if (im.KeyIsDown(Key::D) && movementComp.velocity.x < kMaxRunVelocity) {
+            if (im.KeyIsDown(kRightKey) && movementComp.velocity.x < kMaxRunVelocity) {
                 movementComp.velocity.x += kAirRunAcceleration;
             }
-            if (im.KeyIsDown(Key::A) && movementComp.velocity.x > -kMaxRunVelocity) {
+            if (im.KeyIsDown(kLeftKey) && movementComp.velocity.x > -kMaxRunVelocity) {
                 movementComp.velocity.x -= kAirRunAcceleration;
             }
-            if (im.KeyIsDown(Key::S)) {
+            if (im.KeyIsDown(kDownKey)) {
                 movementComp.velocity.y += kAirRunAcceleration;
             }
         }
@@ -65,10 +72,16 @@ private:
     void handleCoyoteAndBuffering(InputManager& im, InputComponent& inputComp,
                                   CollisionComponent& collisionComp) {
         // jump buffering
-        if (im.KeyJustPressed(Key::Space)) {
+        if (im.KeyJustPressed(kJumpKey)) {
             inputComp.jumpBufferTime = kJumpBufferTime;
         } else if (inputComp.jumpBufferTime > 0) {
             inputComp.jumpBufferTime--;
+        }
+
+        if (im.KeyJustPressed(kDashKey)) {
+            inputComp.dashBufferTime = kJumpBufferTime;
+        } else if (inputComp.dashBufferTime > 0) {
+            inputComp.dashBufferTime--;
         }
 
         // dash delay
@@ -103,36 +116,38 @@ private:
     }
 
     void consumeDash(InputComponent& inputComp) {
-        lockJump(inputComp);
         inputComp.dashesLeft--;
         inputComp.dashLockout = kDashDelay;
+        inputComp.dashBufferTime = 0;
     }
 
-    void attempDash(EngineView<Components...>* engine, SoundManager& sm, InputManager& im,
-                    InputComponent& inputComp, MovementComponent& movementComp,
-                    GravityComponent& gravityComp) {
-        if (inputComp.dashesLeft > 0 && inputComp.dashLockout == 0) {
-            if (im.KeyIsDown(Key::D) && !im.KeyIsDown(Key::A)) {
-                movementComp.velocity.x = kDashVelocity;
-                movementComp.velocity.y = 0;
-                gravityComp.disabledTime = kDashInterval;
-                consumeDash(inputComp);
-                CameraSystem<Components...>::ApplyScreenShake(engine, {kDashVelocity, 0});
-                sm.Play(inputComp.dashSound, 0.7);
-            } else if (im.KeyIsDown(Key::A) && !im.KeyIsDown(Key::D)) {
-                movementComp.velocity.x = -kDashVelocity;
-                movementComp.velocity.y = 0;
-                gravityComp.disabledTime = kDashInterval;
-                consumeDash(inputComp);
-                CameraSystem<Components...>::ApplyScreenShake(engine, {-kDashVelocity, 0});
-                sm.Play(inputComp.dashSound, 0.7);
+    void HandleDashing(EngineView<Components...>* engine, SoundManager& sm, InputManager& im,
+                       InputComponent& inputComp, MovementComponent& movementComp,
+                       GravityComponent& gravityComp) {
+        if (inputComp.dashBufferTime > 0) {
+            inputComp.dashBufferTime--;
+            if (inputComp.dashesLeft > 0 && inputComp.dashLockout == 0) {
+                if (im.KeyIsDown(kRightKey) && !im.KeyIsDown(kLeftKey)) {
+                    movementComp.velocity.x = kDashVelocity;
+                    movementComp.velocity.y = 0;
+                    gravityComp.disabledTime = kDashInterval;
+                    consumeDash(inputComp);
+                    CameraSystem<Components...>::ApplyScreenShake(engine, {kDashVelocity, 0});
+                    sm.Play(inputComp.dashSound, 0.7);
+                } else if (im.KeyIsDown(kLeftKey) && !im.KeyIsDown(kRightKey)) {
+                    movementComp.velocity.x = -kDashVelocity;
+                    movementComp.velocity.y = 0;
+                    gravityComp.disabledTime = kDashInterval;
+                    consumeDash(inputComp);
+                    CameraSystem<Components...>::ApplyScreenShake(engine, {-kDashVelocity, 0});
+                    sm.Play(inputComp.dashSound, 0.7);
+                }
             }
         }
     }
 
-    void handleJumpingAndDashing(EngineView<Components...>* engine, SoundManager& sm,
-                                 InputManager& im, InputComponent& inputComp,
-                                 MovementComponent& movementComp, GravityComponent& gravityComp) {
+    void handleJumping(SoundManager& sm, InputManager& im, InputComponent& inputComp,
+                       MovementComponent& movementComp) {
         if (inputComp.jumpBufferTime > 0) {
             // veritcal jump
             if (inputComp.timeSinceGround < kCoyoteTime) {
@@ -155,12 +170,10 @@ private:
                 movementComp.velocity.x = -kJumpWallHorizontalAcceleration;
                 movementComp.velocity.y = -kJumpWallVerticalAcceleration;
                 sm.Play(inputComp.jumpSound, 0.3);
-            } else {
-                attempDash(engine, sm, im, inputComp, movementComp, gravityComp);
             }
         } else if (inputComp.jumpTime > 0) {
             // extended jump
-            if (im.KeyIsDown(Key::Space)) {
+            if (im.KeyIsDown(kJumpKey)) {
                 movementComp.velocity.y -= kJumpExtendedAcceleration;
                 if (inputComp.jumpTime == 2) {
                     sm.Play(inputComp.jumpHighSound, 0.6);
@@ -173,8 +186,8 @@ private:
     void handleWallSliding(SoundManager& sm, InputManager& im, InputComponent& inputComp,
                            MovementComponent& movementComp, CollisionComponent& collisionComp) {
         // wall slide
-        if (((im.KeyIsDown(Key::D) && collisionComp.onRightWall) ||
-             (im.KeyIsDown(Key::A) && collisionComp.onLeftWall)) &&
+        if (((im.KeyIsDown(kRightKey) && collisionComp.onRightWall) ||
+             (im.KeyIsDown(kLeftKey) && collisionComp.onLeftWall)) &&
             movementComp.velocity.y > 0) {
             movementComp.velocity.y *= 1.0f - kWallSlideFriction;
             if (inputComp.slideSoundTimeout <= 0) {
@@ -266,7 +279,8 @@ public:
 
                 handleRunning(im, movementComp, collisionComp);
                 handleCoyoteAndBuffering(im, inputComp, collisionComp);
-                handleJumpingAndDashing(engine, sm, im, inputComp, movementComp, gravityComp);
+                handleJumping(sm, im, inputComp, movementComp);
+                HandleDashing(engine, sm, im, inputComp, movementComp, gravityComp);
                 handleWallSliding(sm, im, inputComp, movementComp, collisionComp);
                 handleFriction(movementComp, collisionComp);
                 handleAnimation(sm, inputComp, movementComp, collisionComp, spriteComp);

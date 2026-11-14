@@ -47,6 +47,7 @@ struct InputComponent {
     uint dashLockout = 0;
     uint jumpTime = 0;
     uint jumpBufferTime = 0;
+    uint dashBufferTime = 0;
     uint timeSinceGround = std::numeric_limits<uint>::max() / 2;
     uint timeSinceLeftWall = std::numeric_limits<uint>::max() / 2;
     uint timeSinceRightWall = std::numeric_limits<uint>::max() / 2;
