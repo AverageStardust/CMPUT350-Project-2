@@ -1,11 +1,16 @@
 #include "SoundManager.h"
 
-#include <iostream>
-
 #include "SFML/Audio/Sound.hpp"
-#include "WindowManager.h"
 
 namespace ECSEngine {
+
+SoundManager::~SoundManager() {
+    for (auto iter = playingSounds.begin(); iter != playingSounds.end(); iter++) {
+        sf::Sound* sound = *iter;
+        delete sound;
+        playingSounds.Remove(iter.GetTicket());
+    }
+}
 
 SoundID SoundManager::RegisterSound(const std::string& soundPath) {
     sf::SoundBuffer buffer;

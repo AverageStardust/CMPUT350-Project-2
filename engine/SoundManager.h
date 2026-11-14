@@ -14,7 +14,7 @@ using SoundID = Ticket;
 class SoundManager {
 public:
     SoundManager() = default;
-    ~SoundManager() = default;
+    ~SoundManager();
     SoundID RegisterSound(const std::string& soundPath);
 
     /*
